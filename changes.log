@@ -1,0 +1,7 @@
+## 2026-10-27 — Wortsuchrätsel
+
+- Neues Spiel „Wortsuchrätsel“ unter `games/word-search/`: 13 × 13 Gitter, zehn zufällig gewählte englische Wörter pro Runde mit deutschen Übersetzungen, Schwierigkeitsstufen Einfach und Schwierig.
+- Vokabeln als lokale JSON-Datei `public/data/vocabulary.json` mit GER-Niveau A1 bis C2; Auswahl der Niveaus wird im Browser gespeichert.
+- Markieren per Klick oder Ziehen, bis zu zehn Markierungen, Prüfung über „Lösen“ und Tipp-Funktion.
+- Spieleübersicht `index.html` und GitHub-Pages-Workflow `.github/workflows/pages.yml` mit Prüfung, Veröffentlichung und Smoke-Test.
+- Anwender- und technische Dokumentation unter `docs/help/spiele/`.

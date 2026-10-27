@@ -1,0 +1,71 @@
+name: Verify and deploy Pages
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - task/f1715e2ee589498bb686384c49ebb639-wortsuchraetsel
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: 0
+      VITE_BASE_PATH: /${{ github.event.repository.name }}/
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+      - name: E2E against the production build under the project path
+        run: npm run test:e2e
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name == 'push'
+        with:
+          path: dist
+  deploy:
+    if: github.event_name == 'push'
+    needs: verify
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+  smoke:
+    if: github.event_name == 'push'
+    needs: deploy
+    runs-on: ubuntu-latest
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: 0
+      PAGE_URL: ${{ needs.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Check that the deployment URL is known and reachable
+        run: |
+          test -n "$PAGE_URL"
+          curl --fail --silent --show-error --retry 5 --retry-delay 5 --retry-all-errors "$PAGE_URL" > /dev/null
+          curl --fail --silent --show-error --retry 5 --retry-delay 5 --retry-all-errors "${PAGE_URL%/}/games/word-search/" > /dev/null
+          curl --fail --silent --show-error --retry 5 --retry-delay 5 --retry-all-errors "${PAGE_URL%/}/data/vocabulary.json" > /dev/null
+      - name: Browser smoke test of the published page
+        run: npm run test:smoke
