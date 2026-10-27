@@ -36,6 +36,8 @@ Du hast zwei Möglichkeiten:
 
 Nach dem Klicken wählst du „Markierung übernehmen“. Die Markierung erscheint unter „Deine Markierungen“. Du kannst bis zu zehn Markierungen anlegen, eine je gesuchtem Wort.
 
+Das erste Feld jeder Markierung (oben bzw. links) trägt im Gitter eine kleine Nummer. Sie entspricht der Nummer in der Liste „Deine Markierungen“. Fährst du mit der Maus über einen Listeneintrag oder springst du mit der Tastatur zu seinen Schaltflächen, werden die Felder dieser Markierung im Gitter eingerahmt.
+
 > **Hinweis:** Ist eine Auswahl offen, kannst du im Gitter erst wieder ziehen, wenn du die Auswahl übernommen oder mit „Auswahl verwerfen“ abgebrochen hast.
 
 ### 6. Markierungen anpassen

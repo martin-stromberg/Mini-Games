@@ -130,6 +130,15 @@ function slotKindsByCell() {
   return kinds;
 }
 
+function slotNumbersByStartCell() {
+  const numbers = new Map();
+  state.slots.forEach((slot, index) => {
+    if (!slot?.length) return;
+    numbers.set(slot[0], [...(numbers.get(slot[0]) || []), index + 1]);
+  });
+  return numbers;
+}
+
 function cellClasses(key, marking) {
   const classes = ['cell'];
   if (marking) classes.push('marked');
@@ -140,20 +149,24 @@ function cellClasses(key, marking) {
   return classes.join(' ');
 }
 
-function cellLabel(letter, row, col, key, marking) {
+function cellLabel(letter, row, col, key, marking, startNumbers) {
   const parts = [`Buchstabe ${letter}, Zeile ${row + 1}, Spalte ${col + 1}`];
   if (state.draft.cells.has(key)) parts.push('in der aktuellen Auswahl');
   if (marking) parts.push(marking.count > 1 ? `in ${marking.count} Markierungen` : 'markiert');
+  if (startNumbers) parts.push(`Beginn von Markierung ${startNumbers.join(' und ')}`);
   if (state.hintCell === key) parts.push('Tipp-Feld');
   return parts.join(', ');
 }
 
 function renderBoard() {
   const markings = slotKindsByCell();
+  const startCells = slotNumbersByStartCell();
   const cells = state.round.grid.map((line, row) => line.map((letter, col) => {
     const key = coordKey({ row, col });
     const marking = markings.get(key);
-    return `<button type="button" class="${cellClasses(key, marking)}" data-cell="${key}" tabindex="${key === state.focusCell ? 0 : -1}" aria-pressed="${state.draft.cells.has(key)}" aria-label="${cellLabel(letter, row, col, key, marking)}">${letter}</button>`;
+    const startNumbers = startCells.get(key);
+    const badge = startNumbers ? ` data-slot-badge="${startNumbers.join(',')}"` : '';
+    return `<button type="button" class="${cellClasses(key, marking)}" data-cell="${key}"${badge} tabindex="${key === state.focusCell ? 0 : -1}" aria-pressed="${state.draft.cells.has(key)}" aria-label="${cellLabel(letter, row, col, key, marking, startNumbers)}">${letter}</button>`;
   }).join('')).join('');
   return `
     <p class="instructions" id="board-help">Klicke die Buchstaben eines Wortes nacheinander an und wähle „Markierung übernehmen“ – oder ziehe mit gedrückter Maustaste bzw. dem Finger in einer geraden Linie über das Wort. Mit den Pfeiltasten bewegst du dich im Gitter, die Leertaste wählt ein Feld aus.</p>
@@ -204,7 +217,7 @@ function renderSlots() {
         <button type="button" data-edit="${index}" aria-label="${name} ändern">Ändern</button>
         <button type="button" data-drag-replace="${index}" aria-label="${name} neu ziehen">Neu ziehen</button>
         <button type="button" data-remove="${index}" aria-label="${name} entfernen">Entfernen</button>` : '';
-    return `<li data-slot="${index}"><span>${name}: <strong>${slotText(index)}</strong></span>${buttons}</li>`;
+    return `<li data-slot="${index}"><span><span class="slot-number" aria-hidden="true">${index + 1}</span>${name}: <strong>${slotText(index)}</strong></span>${buttons}</li>`;
   }).join('');
   return `<h2>Deine Markierungen</h2><ol class="slots">${items}</ol>`;
 }
@@ -437,6 +450,11 @@ function handleBoardFocus(event) {
   if (button) state.focusCell = button.dataset.cell;
 }
 
+function highlightSlot(index) {
+  document.querySelectorAll('.cell.slot-highlight').forEach(cell => cell.classList.remove('slot-highlight'));
+  for (const key of state.slots[index] || []) document.querySelector(`[data-cell="${key}"]`)?.classList.add('slot-highlight');
+}
+
 function bindGameEvents() {
   document.querySelector('[data-action=settings]').addEventListener('click', openSettings);
   document.querySelector('[data-action=new-round]').addEventListener('click', () => startRound(state.round.difficulty));
@@ -447,6 +465,11 @@ function bindGameEvents() {
   document.querySelectorAll('[data-edit]').forEach(button => button.addEventListener('click', () => startEditSlot(Number(button.dataset.edit))));
   document.querySelectorAll('[data-remove]').forEach(button => button.addEventListener('click', () => removeSlot(Number(button.dataset.remove))));
   document.querySelectorAll('[data-drag-replace]').forEach(button => button.addEventListener('click', () => startDragReplace(Number(button.dataset.dragReplace))));
+  document.querySelectorAll('[data-slot]').forEach(item => {
+    const index = Number(item.dataset.slot);
+    for (const type of ['mouseenter', 'focusin']) item.addEventListener(type, () => highlightSlot(index));
+    for (const type of ['mouseleave', 'focusout']) item.addEventListener(type, () => highlightSlot(null));
+  });
   const board = document.querySelector('[data-board]');
   board.addEventListener('pointerdown', handlePointerDown);
   board.addEventListener('pointermove', handlePointerMove);
