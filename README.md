@@ -112,7 +112,7 @@ Die E2E-Tests bauen und starten den Preview-Server selbst (siehe `playwright.con
 
 ## Deployment
 
-Der Workflow `.github/workflows/pages.yml` läuft bei Pull Requests sowie bei Pushes auf `main` und den Feature-Branch `task/f1715e2ee589498bb686384c49ebb639-wortsuchraetsel`:
+Der Workflow `.github/workflows/pages.yml` läuft bei Pull Requests und bei Pushes auf `main`:
 
 1. **verify** (bei jedem Lauf): `npm ci`, `npm test`, `npm run test:e2e`, `npm run build`. Bei Pushes wird `dist/` als Pages-Artefakt hochgeladen.
 2. **deploy** (nur bei Push): veröffentlicht das Artefakt über `actions/deploy-pages`.

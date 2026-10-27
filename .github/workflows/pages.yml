@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - task/f1715e2ee589498bb686384c49ebb639-wortsuchraetsel
 
 permissions:
   contents: read

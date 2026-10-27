@@ -49,7 +49,7 @@
 Die Datei `.github/workflows/pages.yml` (Name „Verify and deploy Pages“) arbeitet so:
 
 - **Pull Requests:** Job `verify` führt `npm test`, `npm run test:e2e` (gegen den Produktionsbuild mit Projektpfad) und `npm run build` aus. Es wird nichts veröffentlicht.
-- **Push auf `main` oder den Feature-Branch:** Zusätzlich lädt der Workflow das Verzeichnis `dist` hoch (Job `verify`), veröffentlicht es über `actions/deploy-pages` (Job `deploy`, Environment `github-pages`) und prüft danach die veröffentlichte URL mit `npm run test:smoke` (Job `smoke`).
+- **Push auf `main`:** Zusätzlich lädt der Workflow das Verzeichnis `dist` hoch (Job `verify`), veröffentlicht es über `actions/deploy-pages` (Job `deploy`, Environment `github-pages`) und prüft danach die veröffentlichte URL mit `npm run test:smoke` (Job `smoke`).
 - Der Workflow benötigt die Berechtigungen `pages: write` und `id-token: write`.
 
 **Einmalige Einrichtung im Repository:** Unter den Pages-Einstellungen muss als Quelle „GitHub Actions“ gewählt sein. Ohne diese Einstellung schlägt der Deploy-Job fehl.
@@ -66,4 +66,4 @@ Die Datei `.github/workflows/pages.yml` (Name „Verify and deploy Pages“) arb
 
 1. `npm run dev` starten und `/games/word-search/` öffnen. Die Niveauauswahl muss erscheinen.
 2. Nach „Runde starten“ müssen Gitter und zehn Übersetzungen sichtbar sein.
-3. Nach einem Push zum Feature-Branch: Im Actions-Tab sind die Jobs `verify`, `deploy` und `smoke` grün. Die Seite ist unter der Pages-URL erreichbar.
+3. Nach dem Merge bzw. Push auf `main`: Im Actions-Tab sind die Jobs `verify`, `deploy` und `smoke` grün. Die Seite ist unter der Pages-URL erreichbar.
