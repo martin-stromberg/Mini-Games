@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect x="22" y="8" width="84" height="110" rx="3" fill="#5c8fbf"/>
+  <rect x="22" y="8" width="84" height="8" rx="3" fill="#41709c"/>
+  <g fill="#cfe8fb">
+    <rect x="30" y="22" width="68" height="10"/>
+    <rect x="30" y="38" width="68" height="10"/>
+    <rect x="30" y="54" width="68" height="10"/>
+    <rect x="30" y="70" width="68" height="10"/>
+  </g>
+  <g stroke="#5c8fbf" stroke-width="3">
+    <path d="M47 22 V80 M64 22 V80 M81 22 V80"/>
+  </g>
+  <rect x="50" y="90" width="28" height="28" fill="#2f4f6f"/>
+  <path d="M64 90 V118" stroke="#5c8fbf" stroke-width="2"/>
+  <rect x="12" y="116" width="104" height="4" rx="2" fill="#607d8b"/>
+</svg>

@@ -35,7 +35,11 @@ function fromSource(entry) {
   };
 }
 
-const ordered = entry => Object.fromEntries(FIELDS.map(field => [field, entry[field] ?? (field === 'synonyms' ? [] : '')]));
+// Optionales Symbolbild (Pfad unter public/) bleibt erhalten; die Quelle liefert keins.
+const ordered = entry => ({
+  ...Object.fromEntries(FIELDS.map(field => [field, entry[field] ?? (field === 'synonyms' ? [] : '')])),
+  ...(entry.image ? { image: entry.image } : {})
+});
 
 const byLevel = new Map(LEVELS.map(level => [level, existsSync(targetFile(level)) ? readJson(targetFile(level)) : []]));
 const byKey = new Map([...byLevel.values()].flat().map(entry => [matchKey(entry.english), entry]));
