@@ -1,10 +1,9 @@
 import { expect } from '@playwright/test';
-import { DIFFICULTY, LEVELS, MIN_WORD_LENGTH, SIZE, WORDS_PER_ROUND } from '../src/word-search/game.js';
+import { DIFFICULTY, LEVELS, MIN_WORD_LENGTH, SIZE, STORAGE_KEY, WORDS_PER_ROUND } from '../src/word-search/game.js';
 import { pathKeys, roundFor } from '../test/fixtures/rounds.js';
 
-export { DIFFICULTY, LEVELS, MIN_WORD_LENGTH, SIZE, WORDS_PER_ROUND };
+export { DIFFICULTY, LEVELS, MIN_WORD_LENGTH, SIZE, STORAGE_KEY, WORDS_PER_ROUND };
 export * from '../test/fixtures/rounds.js';
-export const STORAGE_KEY = 'mini-games.word-search.levels';
 export const GAME_PATH = 'games/word-search/';
 
 export async function storeLevels(page, value) {
@@ -40,13 +39,17 @@ export async function markByClick(page, keys) {
   await commit(page);
 }
 
-export async function drag(page, fromKey, toKey) {
+export async function startDrag(page, fromKey, toKey) {
   await page.locator('[data-board]').evaluate(board => board.scrollIntoView({ block: 'center' }));
   const from = await cell(page, fromKey).boundingBox();
   const to = await cell(page, toKey).boundingBox();
   await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
   await page.mouse.down();
   await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 6 });
+}
+
+export async function drag(page, fromKey, toKey) {
+  await startDrag(page, fromKey, toKey);
   await page.mouse.up();
 }
 

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { cell, clickCells, dragTarget, freeCell, hint, hintedCells, isolatedTargetIndex, markByClick, message, openGame, pathKeys, roundFor, slot } from './support.js';
+import { WORDS_PER_ROUND, cell, clickCells, dragTarget, freeCell, hint, hintedCells, isolatedTargetIndex, markByClick, message, openGame, pathKeys, roundFor, slot } from './support.js';
 
 const SEED = 91;
 const reference = roundFor(SEED);
@@ -59,6 +59,6 @@ test.describe('Tipp ohne falschen Kreis', () => {
     await hint(page);
     await expect(message(page)).toHaveText('Für den aktuellen Stand gibt es keinen weiteren Feldhinweis.');
     expect(await hintedCells(page)).toEqual([]);
-    for (let index = 0; index < 10; index++) await expect(slot(page, index)).toContainText('Felder markiert');
+    for (let index = 0; index < WORDS_PER_ROUND; index++) await expect(slot(page, index)).toContainText('Felder markiert');
   });
 });

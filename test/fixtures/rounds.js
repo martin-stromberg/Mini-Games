@@ -1,11 +1,11 @@
 import { readFileSync } from 'node:fs';
-import { DIFFICULTY, LEVELS, SIZE, coordKey, generateRound, seededRandom, toSortedCellKeys, validateVocabulary } from '../../src/word-search/game.js';
+import { DIFFICULTY, LEVELS, SIZE, coordKey, generateRound, pathKeys, seededRandom, toSortedCellKeys, validateVocabulary } from '../../src/word-search/game.js';
 
 export const rawVocabulary = JSON.parse(readFileSync(new URL('../../public/data/vocabulary.json', import.meta.url), 'utf8'));
 export const vocabulary = validateVocabulary(rawVocabulary);
 
 export const roundFor = (seed, difficulty = DIFFICULTY.EASY, levels = LEVELS) => generateRound(vocabulary, levels, difficulty, seededRandom(seed));
-export const pathKeys = target => target.path.map(coordKey);
+export { pathKeys };
 export const exactSlot = target => toSortedCellKeys(target.path);
 
 export function cellOwners(round) {

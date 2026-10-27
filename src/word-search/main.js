@@ -1,7 +1,6 @@
-import { DIFFICULTY, LEVELS, SIZE, WORDS_PER_ROUND, classifySlots, coordKey, generateRound, getHint, parseKey, seededRandom, straightPath, toSortedCellKeys, validateVocabulary } from './game.js';
+import { DIFFICULTY, LEVELS, SIZE, STORAGE_KEY, WORDS_PER_ROUND, classifySlots, coordKey, generateRound, getHint, parseKey, seededRandom, straightPath, toSortedCellKeys, validateVocabulary } from './game.js';
 
 const app = document.querySelector('#app');
-const STORAGE_KEY = 'mini-games.word-search.levels';
 const FOCUS_ATTRIBUTES = ['data-cell', 'data-action', 'data-edit', 'data-drag-replace', 'data-remove'];
 const KIND_PRIORITY = { exact: 1, partial: 2, error: 3 };
 const ARROW_STEPS = { ArrowLeft: [0, -1], ArrowRight: [0, 1], ArrowUp: [-1, 0], ArrowDown: [1, 0] };

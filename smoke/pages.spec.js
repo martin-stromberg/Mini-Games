@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { LEVELS, SIZE, WORDS_PER_ROUND } from '../src/word-search/game.js';
 
 test('published overview links to the game under the project path', async ({ page }) => {
   await page.goto('./');
@@ -13,9 +14,9 @@ test('published game loads assets and vocabulary, shows levels and starts a roun
   await page.goto('games/word-search/');
   await vocabularyResponse;
   await page.reload();
-  await expect(page.locator('[data-level]')).toHaveCount(6);
+  await expect(page.locator('[data-level]')).toHaveCount(LEVELS.length);
   await expect(page.locator('[data-setup-status]')).toContainText('Wörter stehen zur Auswahl bereit');
   await page.getByRole('button', { name: 'Runde starten' }).click();
-  await expect(page.locator('.cell')).toHaveCount(169);
-  await expect(page.locator('.translations li')).toHaveCount(10);
+  await expect(page.locator('.cell')).toHaveCount(SIZE * SIZE);
+  await expect(page.locator('.translations li')).toHaveCount(WORDS_PER_ROUND);
 });

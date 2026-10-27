@@ -90,10 +90,12 @@ Weitere Regeln:
 **Beschreibung:** Der Tipp kreist genau ein Feld ein, in fester Priorität.
 
 **Verhalten (in dieser Reihenfolge):**
-1. Gibt es einen Slot der Klasse `error`, wird dessen erste Extrazelle eingekreist.
-2. Sonst wird für einen `partial`-Slot ein Nachbarfeld des Pfads eingekreist, das in keinem Slot markiert ist.
-3. Sonst wird das erste global unmarkierte Feld des ersten nicht gefundenen Zielworts eingekreist.
-4. Sonst: „Für den aktuellen Stand gibt es keinen weiteren Feldhinweis.“
+Die Priorität ist stabil: Slots nach Slotnummer, Zielwörter in Rundenreihenfolge, Zellen in Reihenfolge Zeile, dann Spalte. Ein Feld gilt als markiert, wenn es in irgendeinem Slot ausgewählt ist.
+
+1. Gibt es Slots der Klasse `error`, wird im Slot mit der niedrigsten Nummer die erste Extrazelle eingekreist. Extrazellen sind die ausgewählten Zellen außerhalb des längsten zusammenhängenden Pfadabschnitts; bei Gleichstand zählt das frühere Zielwort, dann der frühere Abschnitt.
+2. Sonst werden die `partial`-Slots nach Slotnummer geprüft und darin die Kandidatenpfade in Rundenreihenfolge. Eingekreist wird das erste Pfadfeld direkt vor oder hinter der markierten Teilstrecke, das in keinem Slot markiert ist. Ist beim ersten Kandidaten kein solches Feld frei, folgen die weiteren Kandidaten und danach die weiteren `partial`-Slots. Bei einer einzelnen Kreuzungszelle entscheidet so das frühere Zielwort.
+3. Sonst wird das erste unmarkierte Feld des ersten nicht gefundenen Zielworts eingekreist. Hat dieses Wort kein unmarkiertes Feld, folgt das nächste nicht gefundene Wort.
+4. Sonst (zum Beispiel wenn alle zehn Wörter durch exakte Slots abgedeckt sind): „Für den aktuellen Stand gibt es keinen weiteren Feldhinweis.“
 
 Bei offenem Entwurf ist der Tipp gesperrt. Der Tipp verändert weder Slots noch Entwurf noch Ergebnis.
 

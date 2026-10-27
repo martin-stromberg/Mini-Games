@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { LEVELS, MIN_WORD_LENGTH, SIZE, WORDS_PER_ROUND, validateVocabulary } from '../src/word-search/game.js';
+import { LEVELS, MIN_WORD_LENGTH, SIZE, WORD_PATTERN, WORDS_PER_ROUND, validateVocabulary } from '../src/word-search/game.js';
 import { vocabulary } from './fixtures/rounds.js';
 
 for (const level of LEVELS) {
@@ -15,7 +15,7 @@ test('real vocabulary contains a word of minimum and of maximum length', () => {
 });
 
 test('real vocabulary only contains distinct A-Z words with translations', () => {
-  assert.ok(vocabulary.every(word => new RegExp(`^[A-Z]{${MIN_WORD_LENGTH},${SIZE}}$`).test(word.english) && word.german.trim()));
+  assert.ok(vocabulary.every(word => WORD_PATTERN.test(word.english) && word.german.trim()));
   assert.equal(new Set(vocabulary.map(word => word.english)).size, vocabulary.length);
 });
 

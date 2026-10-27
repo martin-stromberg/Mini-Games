@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { WORDS_PER_ROUND, cell, clickCells, commit, draftState, dragTarget, expectFound, exactSlot, hint, hintedCells, markByClick, message, openGame, pathKeys, result, slot, solve } from './support.js';
+import { WORDS_PER_ROUND, cell, clickCells, commit, draftState, dragTarget, expectFound, exactSlot, hint, hintedCells, markByClick, message, openGame, pathKeys, result, slot, solve, startDrag } from './support.js';
 
 const SEED = 21;
 
@@ -44,12 +44,7 @@ test.describe('Zehn Markierungen per Drag', () => {
   test('a drag shows a live preview of the straight path while the pointer is down', async ({ page }) => {
     const round = await openGame(page, { seed: SEED });
     const keys = pathKeys(round.targets[0]);
-    await page.locator('[data-board]').evaluate(board => board.scrollIntoView({ block: 'center' }));
-    const from = await cell(page, keys[0]).boundingBox();
-    const to = await cell(page, keys[keys.length - 1]).boundingBox();
-    await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
-    await page.mouse.down();
-    await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 6 });
+    await startDrag(page, keys[0], keys[keys.length - 1]);
     await expect(page.locator('.cell.preview')).toHaveCount(keys.length);
     await page.mouse.up();
     await expect(page.locator('.cell.preview')).toHaveCount(0);
@@ -57,14 +52,20 @@ test.describe('Zehn Markierungen per Drag', () => {
 });
 
 test.describe('Zwei Wörter, Pflege und Duplikate', () => {
-  test('two click words and two drag words are each solved separately with two hits', async ({ page }) => {
+  test('two click words are solved separately with two hits', async ({ page }) => {
     const round = await openGame(page, { seed: SEED });
     await markByClick(page, pathKeys(round.targets[0]));
     await markByClick(page, pathKeys(round.targets[1]));
     await solve(page);
     await expectFound(page, 2);
-    await page.getByRole('button', { name: 'Markierung 1 entfernen', exact: true }).click();
-    await page.getByRole('button', { name: 'Markierung 2 entfernen', exact: true }).click();
+    const found = page.locator('.translations .found');
+    await expect(found).toHaveCount(2);
+    await expect(found.nth(0)).toContainText(round.targets[0].german);
+    await expect(found.nth(1)).toContainText(round.targets[1].german);
+  });
+
+  test('two drag words are solved separately with two hits', async ({ page }) => {
+    const round = await openGame(page, { seed: SEED });
     await dragTarget(page, round.targets[2]);
     await dragTarget(page, round.targets[3]);
     await solve(page);

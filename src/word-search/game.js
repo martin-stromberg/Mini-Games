@@ -4,8 +4,10 @@ export const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 export const WORDS_PER_ROUND = 10;
 export const MAX_GENERATION_ATTEMPTS = 120;
 export const DIFFICULTY = Object.freeze({ EASY: 'easy', HARD: 'hard' });
+export const STORAGE_KEY = 'mini-games.word-search.levels';
 
 export const coordKey = ({ row, col }) => `${row},${col}`;
+export const pathKeys = target => target.path.map(coordKey);
 export const parseKey = key => {
   const [row, col] = key.split(',').map(Number);
   return { row, col };
@@ -14,7 +16,7 @@ export const toSortedCellKeys = cells => [...new Set([...cells].map(cell => type
   const x = parseKey(a), y = parseKey(b);
   return x.row - y.row || x.col - y.col;
 });
-const WORD_PATTERN = new RegExp(`^[A-Z]{${MIN_WORD_LENGTH},${SIZE}}$`);
+export const WORD_PATTERN = new RegExp(`^[A-Z]{${MIN_WORD_LENGTH},${SIZE}}$`);
 export const normalizeWord = word => String(word || '').trim().toUpperCase();
 
 export function validateVocabulary(vocabulary) {
@@ -91,13 +93,13 @@ export function generateRound(vocabulary, selectedLevels = LEVELS, difficulty = 
 
 const equalSortedKeys = (a, b) => a.length === b.length && a.every((key, index) => key === b[index]);
 
-function longestContiguousSegment(selected, path) {
-  const pathKeys = path.map(coordKey);
+function longestContiguousSegment(selected, target) {
+  const keys = pathKeys(target);
   let best = [];
-  for (let start = 0; start < pathKeys.length; start++) {
+  for (let start = 0; start < keys.length; start++) {
     const segment = [];
-    for (let end = start; end < pathKeys.length && selected.includes(pathKeys[end]); end++) {
-      segment.push(pathKeys[end]);
+    for (let end = start; end < keys.length && selected.includes(keys[end]); end++) {
+      segment.push(keys[end]);
       if (segment.length > best.length) best = [...segment];
     }
   }
@@ -114,13 +116,13 @@ function classifySlot(slot, slotIndex, targets, found) {
     return { kind: 'exact', slotIndex, candidates: exactCandidates.map(x => x.id), targetId: target?.id, extras: [] };
   }
   const partialCandidates = targets.filter(target => {
-    const path = target.path.map(coordKey);
+    const path = pathKeys(target);
     return selected.length < path.length && path.some((_, start) => equalSortedKeys(selected, toSortedCellKeys(path.slice(start, start + selected.length))));
   });
   if (partialCandidates.length) return { kind: 'partial', slotIndex, candidates: partialCandidates.map(x => x.id), extras: [] };
   let bestSegment = [];
   for (const target of targets) {
-    const segment = longestContiguousSegment(selected, target.path);
+    const segment = longestContiguousSegment(selected, target);
     if (segment.length > bestSegment.length) bestSegment = segment;
   }
   const segmentSet = new Set(bestSegment);
@@ -135,7 +137,7 @@ export function classifySlots(slots, targets) {
 
 function missingNeighbour(slot, target, globallyMarked) {
   const selected = new Set(slot);
-  const path = target.path.map(coordKey);
+  const path = pathKeys(target);
   const indexes = path.map((cell, index) => selected.has(cell) ? index : -1).filter(index => index >= 0);
   return [indexes[0] - 1, indexes[indexes.length - 1] + 1]
     .filter(index => index >= 0 && index < path.length)
@@ -153,7 +155,7 @@ export function getHint(slots, targets) {
     if (cell) return { type: 'missing', cell, result };
   }
   for (const target of targets) if (!result.found.has(target.id)) {
-    const cell = target.path.map(coordKey).find(key => !globallyMarked.has(key));
+    const cell = pathKeys(target).find(key => !globallyMarked.has(key));
     if (cell) return { type: 'missing', cell, result };
   }
   return { type: 'none', cell: null, result };

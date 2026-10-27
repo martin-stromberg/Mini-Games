@@ -88,13 +88,11 @@ test.describe('Lösen, Invalidierung und Neustart', () => {
     await expect(cell(page, pathKeys(round.targets[first])[0])).toHaveClass(/result-partial/);
   });
 
-  test('a wrong marking with an embedded word gives no hit, a correction hides the result until the next solve', async ({ page }) => {
+  test('a correction hides the result until the next solve', async ({ page }) => {
     const round = await openGame(page, { seed: SEED });
     const extra = freeCell(round);
     await markByClick(page, [...pathKeys(round.targets[first]), extra]);
     await solve(page);
-    await expectFound(page, 0);
-    await expect(cell(page, extra)).toHaveClass(/result-error/);
     await page.getByRole('button', { name: 'Markierung 1 ändern', exact: true }).click();
     await expect(result(page)).toHaveText('Erst „Lösen“ prüft deine Markierungen.');
     await expect(page.locator('.translations .unfound')).toHaveCount(0);

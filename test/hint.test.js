@@ -24,6 +24,12 @@ test('a neighbour selected in another slot is never circled as missing', () => {
   assert.equal(hint.cell, isolatedKeys[3]);
 });
 
+test('a partial slot without free neighbours falls back to the next partial slot', () => {
+  const hint = getHint([[isolatedKeys[1]], [isolatedKeys[0]], [isolatedKeys[2]]], round.targets);
+  assert.equal(hint.type, 'missing');
+  assert.equal(hint.cell, isolatedKeys[3]);
+});
+
 test('without free neighbours the first unmarked cell of the next open target is circled', () => {
   const slots = [isolatedKeys.slice(0, 2), isolatedKeys.slice(2)];
   const marked = new Set(isolatedKeys);
