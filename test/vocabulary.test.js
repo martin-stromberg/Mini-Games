@@ -19,6 +19,12 @@ test('real vocabulary only contains distinct A-Z words with translations', () =>
   assert.equal(new Set(vocabulary.map(word => word.english)).size, vocabulary.length);
 });
 
+// Beim Zuordnen muss jede Übersetzung einer Runde eindeutig erkennbar sein.
+test('real vocabulary has distinct German translations', () => {
+  const germanKeys = vocabulary.map(word => word.german.trim().toLocaleLowerCase('de'));
+  assert.equal(new Set(germanKeys).size, vocabulary.length);
+});
+
 test('validation normalises case and outer whitespace', () => {
   const [entry] = validateVocabulary([{ english: '  apple ', german: ' Apfel ', level: 'A1' }]);
   assert.equal(entry.english, 'APPLE');
