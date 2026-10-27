@@ -13,6 +13,17 @@ test.describe('Projekt-Unterpfad', () => {
     await expect(page.locator('[data-setup-status]')).toHaveText(`${rawVocabulary.length} Wörter stehen zur Auswahl bereit.`);
   });
 
+  for (const path of ['./', GAME_PATH]) {
+    test(`the icons of ${path} are linked and served under the project path`, async ({ page, request, baseURL }) => {
+      await page.goto(path);
+      for (const rel of ['icon', 'apple-touch-icon']) {
+        const href = await page.locator(`link[rel="${rel}"]`).getAttribute('href');
+        expect(href.startsWith(new URL(baseURL).pathname)).toBe(true);
+        expect((await request.get(new URL(href, baseURL).href)).ok()).toBe(true);
+      }
+    });
+  }
+
   test('the game route survives direct access and reload', async ({ page }) => {
     const vocabularyResponse = page.waitForResponse(response => response.url().endsWith('/data/vocabulary.json'));
     await page.goto(GAME_PATH);
