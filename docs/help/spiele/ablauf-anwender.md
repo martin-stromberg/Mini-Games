@@ -40,22 +40,29 @@ Das erste Feld jeder Markierung (oben bzw. links) trägt im Gitter eine kleine N
 
 > **Hinweis:** Ist eine Auswahl offen, kannst du im Gitter erst wieder ziehen, wenn du die Auswahl übernommen oder mit „Auswahl verwerfen“ abgebrochen hast.
 
-### 6. Markierungen anpassen
+### 6. Deutsche Übersetzung zuordnen
 
-Bei jeder gespeicherten Markierung stehen die Schaltflächen „Ändern“, „Neu ziehen“ und „Entfernen“ zur Verfügung.
+Nach jeder Markierung fragt das Spiel: „Welche Übersetzung gehört zu Markierung N?“ Klicke oder tippe in der Liste „Gesuchte Übersetzungen“ auf das passende deutsche Wort. Es wird fett dargestellt und trägt die Nummer deiner Markierung. Erst danach kannst du das nächste Wort markieren.
 
-### 7. Lösen
+> **Hinweis:** Jede Übersetzung kann nur einer Markierung zugeordnet werden. Willst du eine Zuordnung ändern, ändere oder entferne die Markierung. Danach ist die Übersetzung wieder frei.
+
+### 7. Markierungen anpassen
+
+Bei jeder gespeicherten Markierung stehen die Schaltflächen „Ändern“, „Neu ziehen“ und „Entfernen“ zur Verfügung. Nach „Ändern“ oder „Neu ziehen“ wählst du die Übersetzung erneut.
+
+### 8. Lösen
 
 Klicke auf „Lösen“. Das Spiel prüft alle Markierungen:
 
-- Korrekt markierte Wörter werden gezählt.
+- Eine Markierung zählt nur, wenn sie das Wort genau trifft und du die richtige Übersetzung zugeordnet hast.
+- Hast du ein Wort richtig gefunden, aber die falsche Übersetzung gewählt, steht bei der Markierung „Wort gefunden, aber falsche Übersetzung“.
 - Die Übersetzungen der noch nicht gefundenen Wörter werden hervorgehoben.
 
-### 8. Tipp nutzen (optional)
+### 9. Tipp nutzen (optional)
 
-Klicke auf „Tipp“, um ein Feld eingekreist zu bekommen. Das ist entweder ein falsch markiertes Feld oder ein Feld eines noch nicht markierten Wortes.
+Klicke auf „Tipp“, um ein Feld eingekreist zu bekommen. Das ist ein falsch markiertes Feld, das erste Feld einer Markierung mit falscher Übersetzung oder ein Feld eines noch nicht markierten Wortes.
 
-### 9. Neue Runde
+### 10. Neue Runde
 
 Klicke auf „Neue Runde“, um ein neues Rätsel zu starten. Mit „Einstellungen ändern“ kehrst du zur Auswahl von Niveau und Schwierigkeit zurück.
 

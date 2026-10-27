@@ -1,11 +1,12 @@
 import { DIFFICULTY, LEVELS, SIZE, STORAGE_KEY, WORDS_PER_ROUND, classifySlots, coordKey, generateRound, getHint, parseKey, seededRandom, straightPath, toSortedCellKeys, validateVocabulary } from './game.js';
 
 const app = document.querySelector('#app');
-const FOCUS_ATTRIBUTES = ['data-cell', 'data-action', 'data-edit', 'data-drag-replace', 'data-remove'];
-const KIND_PRIORITY = { exact: 1, partial: 2, error: 3 };
+const FOCUS_ATTRIBUTES = ['data-cell', 'data-action', 'data-edit', 'data-drag-replace', 'data-remove', 'data-translation'];
+const KIND_PRIORITY = { exact: 1, partial: 2, mismatch: 3, error: 3 };
 const ARROW_STEPS = { ArrowLeft: [0, -1], ArrowRight: [0, 1], ArrowUp: [-1, 0], ArrowDown: [1, 0] };
 
 const emptySlots = () => Array(WORDS_PER_ROUND).fill(null);
+const emptyAssignments = () => Array(WORDS_PER_ROUND).fill(null);
 const emptyDraft = () => ({ cells: new Set(), editingIndex: null, dragReplaceIndex: null });
 
 function createRandomSource() {
@@ -19,6 +20,8 @@ const state = {
   difficulty: DIFFICULTY.EASY,
   round: null,
   slots: emptySlots(),
+  assignments: emptyAssignments(),
+  awaitingAssignment: null,
   draft: emptyDraft(),
   solved: null,
   hintCell: null,
@@ -57,6 +60,14 @@ const resetDraft = () => { state.draft = emptyDraft(); };
 const resetResult = () => { state.solved = null; state.hintCell = null; };
 const firstFreeSlot = () => state.slots.findIndex(slot => !slot);
 const slotName = index => `Markierung ${index + 1}`;
+const targetById = id => state.round.targets.find(target => target.id === id);
+const slotOfTarget = id => state.assignments.indexOf(id);
+
+function blockedByAssignment() {
+  if (state.awaitingAssignment === null) return false;
+  setMessage(`Wähle zuerst die deutsche Übersetzung zu ${slotName(state.awaitingAssignment)}.`);
+  return true;
+}
 
 function setupStatus() {
   const count = state.vocabulary.filter(item => state.selectedLevels.has(item.level)).length;
@@ -105,6 +116,8 @@ function startRound(difficulty) {
     state.difficulty = difficulty;
     state.round = generateRound(state.vocabulary, [...state.selectedLevels], difficulty, state.rng);
     state.slots = emptySlots();
+    state.assignments = emptyAssignments();
+    state.awaitingAssignment = null;
     resetDraft();
     resetResult();
     state.focusCell = '0,0';
@@ -196,17 +209,28 @@ function renderTranslations() {
   const found = state.solved?.found ?? new Set();
   const items = state.round.targets.map(target => {
     const status = state.solved ? (found.has(target.id) ? 'found' : 'unfound') : '';
-    return `<li class="${status}">${escapeHtml(target.german)} <small>${escapeHtml(target.level)}</small></li>`;
+    const slotIndex = slotOfTarget(target.id);
+    const assigned = slotIndex >= 0;
+    const number = assigned ? `<span class="slot-number" aria-hidden="true">${slotIndex + 1}</span>` : '';
+    const label = `${target.german}${assigned ? `, zugeordnet zu ${slotName(slotIndex)}` : ''}`;
+    return `<li class="${status}"><button type="button" class="translation${assigned ? ' assigned' : ''}" data-translation="${escapeHtml(target.id)}" aria-pressed="${assigned}" aria-label="${escapeHtml(label)}">${number}${escapeHtml(target.german)} <small>${escapeHtml(target.level)}</small></button></li>`;
   }).join('');
-  return `<h2>Gesuchte Übersetzungen</h2><ol class="translations">${items}</ol>`;
+  const prompt = state.awaitingAssignment === null ? ''
+    : `<p class="assign-prompt" data-assign-prompt>Welche Übersetzung gehört zu ${slotName(state.awaitingAssignment)}?</p>`;
+  return `<h2>Gesuchte Übersetzungen</h2>${prompt}<ol class="translations${state.awaitingAssignment === null ? '' : ' choosing'}">${items}</ol>`;
 }
 
 function slotText(index) {
   const slot = state.slots[index];
   if (!slot) return 'leer';
-  if (!state.solved) return `${slot.length} Feld${slot.length === 1 ? '' : 'er'} markiert`;
+  if (!state.solved) {
+    const fields = `${slot.length} Feld${slot.length === 1 ? '' : 'er'} markiert`;
+    const target = targetById(state.assignments[index]);
+    return target ? `${fields} – „${escapeHtml(target.german)}“` : `${fields} – Übersetzung fehlt`;
+  }
   const classification = state.solved.classifications[index];
-  if (classification.kind === 'exact') return classification.targetId ? 'korrekt' : 'korrekt, doppelt';
+  if (classification.kind === 'exact') return 'korrekt';
+  if (classification.kind === 'mismatch') return 'Wort gefunden, aber falsche Übersetzung';
   return classification.kind === 'partial' ? 'unvollständig' : 'fehlerhaft';
 }
 
@@ -268,9 +292,11 @@ function storeSlot(index, cells, fullHint) {
     return false;
   }
   state.slots[index] = toSortedCellKeys(cells);
+  state.assignments[index] = null;
+  state.awaitingAssignment = index;
   resetDraft();
   resetResult();
-  setMessage(`${slotName(index)} gespeichert.`);
+  setMessage(`${slotName(index)} gespeichert. Wähle jetzt die passende deutsche Übersetzung.`);
   return true;
 }
 
@@ -293,6 +319,7 @@ function toggleCell(key) {
 }
 
 function handleDrag(start, end) {
+  if (blockedByAssignment()) return;
   if (hasOpenDraft()) {
     setMessage('Übernimm oder verwirf zuerst deine offene Auswahl, bevor du ziehst.');
     return;
@@ -308,12 +335,15 @@ function handleDrag(start, end) {
 }
 
 function solveRound() {
+  if (blockedByAssignment()) { renderGame(); return; }
   if (state.draft.cells.size) {
-    if (!commitDraft()) { renderGame(); return; }
-  } else {
-    resetDraft();
+    // Die offene Auswahl wird übernommen; geprüft wird erst, wenn auch ihre Übersetzung gewählt ist.
+    if (commitDraft()) setMessage(`${slotName(state.awaitingAssignment)} gespeichert. Wähle die passende deutsche Übersetzung und klicke dann erneut auf „Lösen“.`);
+    renderGame();
+    return;
   }
-  state.solved = classifySlots(state.slots, state.round.targets);
+  resetDraft();
+  state.solved = classifySlots(state.slots, state.round.targets, state.assignments);
   state.hintCell = null;
   setMessage(state.solved.found.size === WORDS_PER_ROUND
     ? 'Geschafft! Alle Wörter sind korrekt markiert.'
@@ -322,15 +352,17 @@ function solveRound() {
 }
 
 function showHint() {
+  if (blockedByAssignment()) { renderGame(); return; }
   if (hasOpenDraft()) {
     setMessage('Übernimm oder verwirf zuerst deine offene Auswahl, bevor du einen Tipp nutzt.');
     renderGame();
     return;
   }
-  const hint = getHint(state.slots, state.round.targets);
+  const hint = getHint(state.slots, state.round.targets, state.assignments);
   state.hintCell = hint.cell;
   const messages = {
     error: 'Tipp: Ein falsch markiertes Feld ist eingekreist.',
+    mismatch: 'Tipp: Die Markierung, die am eingekreisten Feld beginnt, gehört zu einer anderen Übersetzung.',
     missing: 'Tipp: Ein noch fehlendes Feld ist eingekreist.',
     none: 'Für den aktuellen Stand gibt es keinen weiteren Feldhinweis.'
   };
@@ -339,7 +371,9 @@ function showHint() {
 }
 
 function startEditSlot(index) {
-  if (hasOpenDraft()) {
+  if (blockedByAssignment()) {
+    // Erst die Übersetzung zur letzten Markierung wählen.
+  } else if (hasOpenDraft()) {
     setMessage('Übernimm oder verwirf zuerst deine offene Auswahl.');
   } else {
     state.draft = { cells: new Set(state.slots[index]), editingIndex: index, dragReplaceIndex: null };
@@ -351,6 +385,8 @@ function startEditSlot(index) {
 
 function removeSlot(index) {
   state.slots[index] = null;
+  state.assignments[index] = null;
+  if (state.awaitingAssignment === index) state.awaitingAssignment = null;
   if (state.draft.editingIndex === index || state.draft.dragReplaceIndex === index) resetDraft();
   resetResult();
   setMessage(`${slotName(index)} entfernt.`);
@@ -358,7 +394,9 @@ function removeSlot(index) {
 }
 
 function startDragReplace(index) {
-  if (hasOpenDraft()) {
+  if (blockedByAssignment()) {
+    // Erst die Übersetzung zur letzten Markierung wählen.
+  } else if (hasOpenDraft()) {
     setMessage('Übernimm oder verwirf zuerst deine offene Auswahl.');
   } else {
     state.draft = { ...emptyDraft(), dragReplaceIndex: index };
@@ -423,7 +461,9 @@ function handleCellClick(event) {
   if (!button) return;
   if (state.suppressClick && event.detail > 0) { state.suppressClick = false; return; }
   state.suppressClick = false;
-  if (state.draft.dragReplaceIndex !== null) {
+  if (blockedByAssignment()) {
+    // Erst die Übersetzung zur letzten Markierung wählen.
+  } else if (state.draft.dragReplaceIndex !== null) {
     setMessage(`Ziehe über das Gitter, um ${slotName(state.draft.dragReplaceIndex)} neu zu markieren, oder verwirf die Aktion.`);
   } else {
     toggleCell(button.dataset.cell);
@@ -450,6 +490,25 @@ function handleBoardFocus(event) {
   if (button) state.focusCell = button.dataset.cell;
 }
 
+function assignTranslation(id) {
+  const target = targetById(id);
+  const owner = slotOfTarget(id);
+  if (state.awaitingAssignment === null) {
+    setMessage(owner >= 0
+      ? `„${target.german}“ ist ${slotName(owner)} zugeordnet.`
+      : 'Markiere zuerst ein Wort im Gitter; danach wählst du die Übersetzung dazu.');
+  } else if (owner >= 0) {
+    setMessage(`„${target.german}“ ist schon ${slotName(owner)} zugeordnet. Wähle eine andere Übersetzung oder entferne bzw. ändere ${slotName(owner)}.`);
+  } else {
+    const index = state.awaitingAssignment;
+    state.assignments[index] = id;
+    state.awaitingAssignment = null;
+    resetResult();
+    setMessage(`„${target.german}“ ist ${slotName(index)} zugeordnet.`);
+  }
+  renderGame();
+}
+
 function highlightSlot(index) {
   document.querySelectorAll('.cell.slot-highlight').forEach(cell => cell.classList.remove('slot-highlight'));
   for (const key of state.slots[index] || []) document.querySelector(`[data-cell="${key}"]`)?.classList.add('slot-highlight');
@@ -458,13 +517,14 @@ function highlightSlot(index) {
 function bindGameEvents() {
   document.querySelector('[data-action=settings]').addEventListener('click', openSettings);
   document.querySelector('[data-action=new-round]').addEventListener('click', () => startRound(state.round.difficulty));
-  document.querySelector('[data-action=commit]').addEventListener('click', () => { commitDraft(); renderGame(); });
+  document.querySelector('[data-action=commit]').addEventListener('click', () => { if (!blockedByAssignment()) commitDraft(); renderGame(); });
   document.querySelector('[data-action=cancel]').addEventListener('click', () => { cancelDraft(); renderGame(); });
   document.querySelector('[data-action=solve]').addEventListener('click', solveRound);
   document.querySelector('[data-action=hint]').addEventListener('click', showHint);
   document.querySelectorAll('[data-edit]').forEach(button => button.addEventListener('click', () => startEditSlot(Number(button.dataset.edit))));
   document.querySelectorAll('[data-remove]').forEach(button => button.addEventListener('click', () => removeSlot(Number(button.dataset.remove))));
   document.querySelectorAll('[data-drag-replace]').forEach(button => button.addEventListener('click', () => startDragReplace(Number(button.dataset.dragReplace))));
+  document.querySelectorAll('[data-translation]').forEach(button => button.addEventListener('click', () => assignTranslation(button.dataset.translation)));
   document.querySelectorAll('[data-slot]').forEach(item => {
     const index = Number(item.dataset.slot);
     for (const type of ['mouseenter', 'focusin']) item.addEventListener(type, () => highlightSlot(index));

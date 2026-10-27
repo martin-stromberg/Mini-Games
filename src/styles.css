@@ -276,6 +276,49 @@ fieldset label {
   border-radius: 0.3rem;
 }
 
+/* Ohne Listennummern, damit sie nicht mit den Markierungsnummern verwechselt werden. */
+.translations {
+  list-style: none;
+  padding-left: 0;
+}
+
+.translation {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  border: 1px solid transparent;
+  border-radius: 0.35rem;
+  background: none;
+  padding: 0.1rem 0.35rem;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.translation:hover {
+  border-color: #b7bfd5;
+}
+
+.translation.assigned {
+  font-weight: 700;
+}
+
+.translations.choosing .translation:not(.assigned) {
+  border-color: var(--accent);
+  background: #f1edff;
+}
+
+.assign-prompt {
+  margin: 0 0 0.4rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.cell.result-mismatch {
+  background: #ffd3d3;
+}
+
 .translations .unfound {
   background: #ffe2e2;
   color: #812020;

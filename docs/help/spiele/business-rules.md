@@ -58,25 +58,38 @@
 
 **Umsetzung:** `straightPath`, `handleDrag`, `handlePointerUp` (mit `suppressClick`).
 
+## Zuordnung der Übersetzung
+
+**Beschreibung:** Zu jeder Markierung wählt der Spieler die passende deutsche Übersetzung.
+
+**Verhalten:**
+- Nach jedem Speichern einer Markierung (Übernehmen, Ziehen, Ändern, Neu ziehen) wird ihre bisherige Zuordnung gelöscht, und das Spiel wartet auf die Wahl einer Übersetzung (`awaitingAssignment`).
+- Solange die Wahl aussteht, sind Zellklick, Ziehen, „Markierung übernehmen“, „Ändern“, „Neu ziehen“, „Tipp“ und „Lösen“ gesperrt. „Entfernen“ bleibt erlaubt und hebt die ausstehende Wahl auf.
+- Ein Klick auf eine freie Übersetzung ordnet sie der wartenden Markierung zu. Die Übersetzung wird fett dargestellt und trägt die Nummer der Markierung.
+- Eine Übersetzung, die schon einer anderen Markierung zugeordnet ist, kann nicht gewählt werden. Sie wird erst frei, wenn diese Markierung entfernt oder geändert wird.
+
+**Umsetzung:** `storeSlot`, `assignTranslation`, `blockedByAssignment` in `src/word-search/main.js`.
+
 ## Prüfen mit „Lösen“
 
 **Beschreibung:** Nur „Lösen“ bewertet die Markierungen.
 
 **Verhalten:**
-- Ein nicht leerer Entwurf wird zuerst übernommen. Gelingt das nicht, passiert nichts.
-- Danach werden alle Slots klassifiziert (siehe unten).
+- Ein nicht leerer Entwurf wird zuerst übernommen. Danach muss der Spieler seine Übersetzung wählen und erneut „Lösen“ klicken.
+- Steht keine Zuordnung aus, werden alle Slots mit ihrer zugeordneten Übersetzung klassifiziert (siehe unten).
 - Ergebnis: Anzahl der verschiedenen gefundenen Zielwörter. Bei zehn ist die Runde gelöst.
 
 **Umsetzung:** `solveRound`, `classifySlots` in `src/word-search/main.js` bzw. `src/word-search/game.js`.
 
 ## Klassifikation eines Slots
 
-Die Auswertung erfolgt über die Zellmengen. Die Klick- oder Ziehreihenfolge spielt keine Rolle.
+Die Auswertung erfolgt über die Zellmengen. Die Klick- oder Ziehreihenfolge spielt keine Rolle. Hat ein Slot eine zugeordnete Übersetzung, wird er nur gegen deren Zielwort geprüft.
 
 | Klasse | Bedingung | Wirkung |
 |--------|-----------|---------|
-| `exact` | Zellmenge entspricht dem vollständigen Pfad eines Zielworts | Zählt als Treffer. Ist das Ziel bereits gefunden, gilt der Slot als „korrekt, doppelt“, zählt aber nicht erneut. |
-| `partial` | Zellmenge ist eine zusammenhängende Teilstrecke eines Zielpfads, aber kürzer als der Pfad | Kein Treffer. Wird bei „Tipp“ berücksichtigt. |
+| `exact` | Zellmenge entspricht dem vollständigen Pfad des zugeordneten Zielworts | Zählt als Treffer. |
+| `mismatch` | Zellmenge entspricht exakt einem anderen Zielwort als dem zugeordneten | Kein Treffer. Anzeige „Wort gefunden, aber falsche Übersetzung“. |
+| `partial` | Zellmenge ist eine zusammenhängende Teilstrecke des zugeordneten Zielpfads, aber kürzer als der Pfad | Kein Treffer. Wird bei „Tipp“ berücksichtigt. |
 | `error` | Weder exakt noch Teilstrecke | Kein Treffer. Zusätzliche Zellen werden als Fehler angezeigt. |
 
 Weitere Regeln:
@@ -94,10 +107,11 @@ Die Priorität ist stabil: Slots nach Slotnummer, Zielwörter in Rundenreihenfol
 
 1. Gibt es Slots der Klasse `error`, wird im Slot mit der niedrigsten Nummer die erste Extrazelle eingekreist. Extrazellen sind die ausgewählten Zellen außerhalb des längsten zusammenhängenden Pfadabschnitts; bei Gleichstand zählt das frühere Zielwort, dann der frühere Abschnitt.
 2. Sonst werden die `partial`-Slots nach Slotnummer geprüft und darin die Kandidatenpfade in Rundenreihenfolge. Eingekreist wird das erste Pfadfeld direkt vor oder hinter der markierten Teilstrecke, das in keinem Slot markiert ist. Ist beim ersten Kandidaten kein solches Feld frei, folgen die weiteren Kandidaten und danach die weiteren `partial`-Slots. Bei einer einzelnen Kreuzungszelle entscheidet so das frühere Zielwort.
-3. Sonst wird das erste unmarkierte Feld des ersten nicht gefundenen Zielworts eingekreist. Hat dieses Wort kein unmarkiertes Feld, folgt das nächste nicht gefundene Wort.
-4. Sonst (zum Beispiel wenn alle zehn Wörter durch exakte Slots abgedeckt sind): „Für den aktuellen Stand gibt es keinen weiteren Feldhinweis.“
+3. Sonst, wenn ein Slot der Klasse `mismatch` existiert, wird das erste Feld (Zeile, dann Spalte) des Slots mit der niedrigsten Nummer eingekreist: „Die Markierung, die am eingekreisten Feld beginnt, gehört zu einer anderen Übersetzung.“
+4. Sonst wird das erste unmarkierte Feld des ersten nicht gefundenen Zielworts eingekreist. Hat dieses Wort kein unmarkiertes Feld, folgt das nächste nicht gefundene Wort.
+5. Sonst (zum Beispiel wenn alle zehn Wörter durch exakte Slots abgedeckt sind): „Für den aktuellen Stand gibt es keinen weiteren Feldhinweis.“
 
-Bei offenem Entwurf ist der Tipp gesperrt. Der Tipp verändert weder Slots noch Entwurf noch Ergebnis.
+Bei offenem Entwurf oder ausstehender Übersetzungswahl ist der Tipp gesperrt. Der Tipp verändert weder Slots noch Entwurf noch Ergebnis.
 
 **Umsetzung:** `getHint`, `missingNeighbour` in `src/word-search/game.js`; `showHint` in `src/word-search/main.js`.
 

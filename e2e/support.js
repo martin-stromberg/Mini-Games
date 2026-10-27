@@ -25,6 +25,13 @@ export const slot = (page, index) => page.locator(`[data-slot="${index}"]`);
 export const message = page => page.locator('[data-message]');
 export const result = page => page.locator('[data-result]');
 export const draftState = page => page.locator('[data-draft-state]');
+export const translation = (page, target) => page.locator(`[data-translation="${target.id}"]`);
+export const assignPrompt = page => page.locator('[data-assign-prompt]');
+
+// Ordnet der zuletzt gespeicherten Markierung die deutsche Übersetzung von target zu.
+export async function assign(page, target) {
+  await translation(page, target).click();
+}
 
 export async function clickCells(page, keys) {
   for (const key of keys) await cell(page, key).click();
@@ -34,9 +41,15 @@ export async function commit(page) {
   await page.getByRole('button', { name: 'Markierung übernehmen' }).click();
 }
 
-export async function markByClick(page, keys) {
+// assignTo: Zielwort, dessen Übersetzung der neuen Markierung zugeordnet wird; null lässt die Zuordnung offen.
+export async function markByClick(page, keys, assignTo = null) {
   await clickCells(page, keys);
   await commit(page);
+  if (assignTo) await assign(page, assignTo);
+}
+
+export async function markTarget(page, target) {
+  await markByClick(page, pathKeys(target), target);
 }
 
 export async function startDrag(page, fromKey, toKey) {
@@ -53,9 +66,11 @@ export async function drag(page, fromKey, toKey) {
   await page.mouse.up();
 }
 
-export async function dragTarget(page, target) {
+// Zieht über das Wort von target und ordnet standardmäßig dessen Übersetzung zu; assignTo = null lässt sie offen.
+export async function dragTarget(page, target, assignTo = target) {
   const keys = pathKeys(target);
   await drag(page, keys[0], keys[keys.length - 1]);
+  if (assignTo) await assign(page, assignTo);
 }
 
 export async function solve(page) {

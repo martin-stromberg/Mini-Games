@@ -88,7 +88,9 @@ test.describe('Einzel-Level-Runden', () => {
       const items = page.locator('.translations li');
       await expect(items).toHaveCount(WORDS_PER_ROUND);
       await expect(items.locator('small')).toHaveText(Array(WORDS_PER_ROUND).fill(level));
-      const texts = await items.evaluateAll(list => list.map(item => item.firstChild.textContent.trim()));
+      // Nur die Textknoten des Übersetzungs-Buttons: ohne Nummer und ohne <small>-Niveau.
+      const texts = await items.locator('[data-translation]').evaluateAll(buttons => buttons.map(button =>
+        [...button.childNodes].filter(node => node.nodeType === Node.TEXT_NODE).map(node => node.textContent).join('').trim()));
       expect(new Set(texts).size).toBe(WORDS_PER_ROUND);
       expect(texts).toEqual(round.targets.map(target => target.german));
     });

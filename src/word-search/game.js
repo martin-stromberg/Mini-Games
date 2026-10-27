@@ -106,9 +106,15 @@ function longestContiguousSegment(selected, target) {
   return best;
 }
 
-function classifySlot(slot, slotIndex, targets, found) {
+function classifySlot(slot, slotIndex, allTargets, found, assignedId) {
   if (!slot?.length) return { kind: 'empty', slotIndex, candidates: [], extras: [] };
   const selected = toSortedCellKeys(slot);
+  const assigned = allTargets.find(target => target.id === assignedId);
+  const targets = assigned ? [assigned] : allTargets;
+  if (assigned && !equalSortedKeys(selected, toSortedCellKeys(assigned.path))) {
+    const other = allTargets.find(target => equalSortedKeys(selected, toSortedCellKeys(target.path)));
+    if (other) return { kind: 'mismatch', slotIndex, candidates: [other.id], extras: [] };
+  }
   const exactCandidates = targets.filter(target => equalSortedKeys(selected, toSortedCellKeys(target.path)));
   if (exactCandidates.length) {
     const target = exactCandidates.find(candidate => !found.has(candidate.id));
@@ -129,9 +135,11 @@ function classifySlot(slot, slotIndex, targets, found) {
   return { kind: 'error', slotIndex, candidates: [], extras: selected.filter(key => !segmentSet.has(key)) };
 }
 
-export function classifySlots(slots, targets) {
+// assignments[i] ist die id der Übersetzung, die der Spieler Markierung i zugeordnet hat.
+// Mit Zuordnung zählt eine Markierung nur, wenn sie genau das Wort dieser Übersetzung trifft.
+export function classifySlots(slots, targets, assignments = []) {
   const found = new Set();
-  const classifications = slots.map((slot, slotIndex) => classifySlot(slot, slotIndex, targets, found));
+  const classifications = slots.map((slot, slotIndex) => classifySlot(slot, slotIndex, targets, found, assignments[slotIndex]));
   return { classifications, found };
 }
 
@@ -145,11 +153,13 @@ function missingNeighbour(slot, target, globallyMarked) {
     .find(candidate => !globallyMarked.has(candidate));
 }
 
-export function getHint(slots, targets) {
-  const result = classifySlots(slots, targets);
+export function getHint(slots, targets, assignments = []) {
+  const result = classifySlots(slots, targets, assignments);
   const globallyMarked = new Set(slots.flatMap(slot => slot || []));
   const bad = result.classifications.find(item => item.kind === 'error');
   if (bad) return { type: 'error', cell: bad.extras[0], result };
+  const mismatch = result.classifications.find(item => item.kind === 'mismatch');
+  if (mismatch) return { type: 'mismatch', cell: toSortedCellKeys(slots[mismatch.slotIndex])[0], result };
   for (const partial of result.classifications.filter(item => item.kind === 'partial')) for (const id of partial.candidates) {
     const cell = missingNeighbour(slots[partial.slotIndex], targets.find(item => item.id === id), globallyMarked);
     if (cell) return { type: 'missing', cell, result };
