@@ -10,7 +10,7 @@ test('published overview links to the game under the project path', async ({ pag
 });
 
 test('published game loads assets and vocabulary, shows levels and starts a round after reload', async ({ page }) => {
-  const vocabularyResponse = page.waitForResponse(response => response.url().endsWith('/data/vocabulary.json') && response.ok());
+  const vocabularyResponse = page.waitForResponse(response => response.url().endsWith('/data/vocabulary/a1.json') && response.ok());
   await page.goto('games/word-search/');
   await vocabularyResponse;
   await page.reload();

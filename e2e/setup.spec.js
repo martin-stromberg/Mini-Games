@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { DIFFICULTY, GAME_PATH, LEVELS, STORAGE_KEY, WORDS_PER_ROUND, openGame, rawVocabulary, storeLevels } from './support.js';
+import { WORD_PATTERN, toGridWord } from '../src/word-search/game.js';
+import { DIFFICULTY, GAME_PATH, LEVELS, STORAGE_KEY, WORDS_PER_ROUND, levelFiles, openGame, puzzleWords, storeLevels } from './support.js';
 
 const storedLevels = page => page.evaluate(key => localStorage.getItem(key), STORAGE_KEY);
 
@@ -10,7 +11,7 @@ test.describe('Projekt-Unterpfad', () => {
     await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(246, 247, 251)');
     await page.getByRole('link', { name: 'Englisches Wortsuchrätsel' }).click();
     await expect(page).toHaveURL(`${baseURL}${GAME_PATH}`);
-    await expect(page.locator('[data-setup-status]')).toHaveText(`${rawVocabulary.length} Wörter stehen zur Auswahl bereit.`);
+    await expect(page.locator('[data-setup-status]')).toHaveText(`${puzzleWords.length} Wörter stehen zur Auswahl bereit.`);
   });
 
   for (const path of ['./', GAME_PATH]) {
@@ -25,7 +26,7 @@ test.describe('Projekt-Unterpfad', () => {
   }
 
   test('the game route survives direct access and reload', async ({ page }) => {
-    const vocabularyResponse = page.waitForResponse(response => response.url().endsWith('/data/vocabulary.json'));
+    const vocabularyResponse = page.waitForResponse(response => response.url().endsWith('/data/vocabulary/a1.json'));
     await page.goto(GAME_PATH);
     expect((await vocabularyResponse).ok()).toBe(true);
     await page.reload();
@@ -75,8 +76,8 @@ test.describe('Levelauswahl und Speicher', () => {
   });
 
   test('a pool with fewer than ten words blocks the start and names count and minimum', async ({ page }) => {
-    const reduced = rawVocabulary.filter(entry => entry.level !== 'A1').concat(rawVocabulary.filter(entry => entry.level === 'A1').slice(0, 5));
-    await page.route('**/data/vocabulary.json', route => route.fulfill({ json: reduced }));
+    const reduced = levelFiles.A1.filter(entry => WORD_PATTERN.test(toGridWord(entry.english))).slice(0, 5);
+    await page.route('**/data/vocabulary/a1.json', route => route.fulfill({ json: reduced }));
     await storeLevels(page, '["A1"]');
     await page.reload();
     await expect(page.getByRole('button', { name: 'Runde starten' })).toBeDisabled();
@@ -84,8 +85,8 @@ test.describe('Levelauswahl und Speicher', () => {
   });
 
   test('vocabulary texts are shown as plain text, not as markup', async ({ page }) => {
-    const tagged = rawVocabulary.map(entry => entry.level === 'A1' ? { ...entry, german: `<b>${entry.german}</b>` } : entry);
-    await page.route('**/data/vocabulary.json', route => route.fulfill({ json: tagged }));
+    const tagged = levelFiles.A1.map(entry => ({ ...entry, german: `<b>${entry.german}</b>` }));
+    await page.route('**/data/vocabulary/a1.json', route => route.fulfill({ json: tagged }));
     await openGame(page, { seed: 3, levels: ['A1'] });
     await expect(page.locator('.translations b')).toHaveCount(0);
     await expect(page.locator('.translations li').first()).toContainText('<b>');

@@ -1,8 +1,11 @@
 import { readFileSync } from 'node:fs';
-import { DIFFICULTY, LEVELS, SIZE, coordKey, generateRound, pathKeys, seededRandom, toSortedCellKeys, validateVocabulary } from '../../src/word-search/game.js';
+import { DIFFICULTY, LEVELS, SIZE, coordKey, generateRound, pathKeys, seededRandom, toPuzzleWords, toSortedCellKeys, validateVocabulary, vocabularyFile } from '../../src/word-search/game.js';
 
-export const rawVocabulary = JSON.parse(readFileSync(new URL('../../public/data/vocabulary.json', import.meta.url), 'utf8'));
+// Inhalt der Vokabeldateien je Niveau, so wie sie ausgeliefert werden (ohne Feld „level“).
+export const levelFiles = Object.fromEntries(LEVELS.map(level => [level, JSON.parse(readFileSync(new URL(`../../public/${vocabularyFile(level)}`, import.meta.url), 'utf8'))]));
+export const rawVocabulary = LEVELS.flatMap(level => levelFiles[level].map(entry => ({ ...entry, level })));
 export const vocabulary = validateVocabulary(rawVocabulary);
+export const puzzleWords = toPuzzleWords(vocabulary);
 
 export const roundFor = (seed, difficulty = DIFFICULTY.EASY, levels = LEVELS) => generateRound(vocabulary, levels, difficulty, seededRandom(seed));
 export { pathKeys };

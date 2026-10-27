@@ -33,7 +33,7 @@
 | Parameter | Typ | Standardwert | Beschreibung |
 |-----------|-----|--------------|--------------|
 | `base` in `vite.config.js` | string | `process.env.VITE_BASE_PATH` oder `/` | Basis-URL für Assets und Vokabeldatei. |
-| Vokabeldatei | JSON | `public/data/vocabulary.json` | Wortliste mit 2316 Einträgen; Format siehe [Datenmodell](datenmodell.md). |
+| Vokabeldateien | JSON | `public/data/vocabulary/a1.json` … `c2.json` | 2454 Einträge je Niveau mit Beispielsätzen; Format siehe [Datenmodell](datenmodell.md). |
 | `WORDS_PER_ROUND` in `src/word-search/game.js` | Zahl | 10 | Anzahl der Wörter pro Runde. |
 | `SIZE` in `src/word-search/game.js` | Zahl | 13 | Kantenlänge des Gitters. |
 | `MAX_GENERATION_ATTEMPTS` in `src/word-search/game.js` | Zahl | 120 | Versuche des Generators, bevor ein Fehler gemeldet wird. |

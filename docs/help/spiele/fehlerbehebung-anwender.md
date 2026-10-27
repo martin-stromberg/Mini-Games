@@ -2,7 +2,7 @@
 
 ## Die Vokabeln konnten nicht geladen werden
 
-**Symptom:** Statt der Niveauauswahl erscheint die Meldung „Die Vokabeldatei konnte nicht geladen werden.“
+**Symptom:** Statt der Niveauauswahl erscheint die Meldung „Die Vokabeldatei für A1 konnte nicht geladen werden.“ (mit dem betroffenen Niveau)
 
 **Ursache:** Die Wortliste ist im Moment nicht erreichbar, zum Beispiel wegen einer Netzwerkunterbrechung.
 

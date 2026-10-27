@@ -4,15 +4,15 @@
 
 **Symptom:** Die Seite zeigt statt der Niveauauswahl eine Fehlermeldung, die einen Eintrag nennt (z. B. „Ungültiges GER-Niveau in Eintrag 12“).
 
-**Ursache:** `validateVocabulary` (`src/word-search/game.js`) findet einen ungültigen Eintrag: Niveau nicht in A1–C2, Wort nicht A–Z mit Länge 2 bis 13, leere Übersetzung oder doppeltes englisches Wort.
+**Ursache:** `validateVocabulary` (`src/word-search/game.js`) findet einen ungültigen Eintrag: fehlender englischer Begriff, leere Übersetzung oder doppelter englischer Begriff (auch über Niveaus hinweg).
 
 **Lösung:**
-1. Den genannten Eintrag in `public/data/vocabulary.json` korrigieren.
+1. Den genannten Eintrag in der Datei des Niveaus unter `public/data/vocabulary/` korrigieren.
 2. `npm test` ausführen; `test/vocabulary.test.js` prüft die Datei.
 
 ## Vokabeldatei kann nicht geladen werden (404)
 
-**Symptom:** „Die Vokabeldatei konnte nicht geladen werden.“ Die Asset-Pfade funktionieren nur lokal.
+**Symptom:** „Die Vokabeldatei für A1 konnte nicht geladen werden.“ (mit dem betroffenen Niveau) Die Asset-Pfade funktionieren nur lokal.
 
 **Ursache:** Der Basispfad stimmt nicht. Auf GitHub Pages liegt die Seite unter einem Projektpfad, der beim Build über `VITE_BASE_PATH` bekannt sein muss.
 
@@ -32,7 +32,7 @@
 
 **Ursache:** Die veröffentlichte URL ist nicht erreichbar, oder eine Datei unter dem Projektpfad fehlt. Die `curl`-Prüfungen im Workflow und `smoke/pages.spec.js` decken diese Fälle ab. Ist `PAGE_URL` leer, bricht der Job bereits am ersten Schritt ab.
 
-**Lösung:** Die im Log genannte URL im Browser öffnen. Prüfen, ob `games/word-search/` und `data/vocabulary.json` erreichbar sind. Ein Deploy-Fehler vorher hat Vorrang vor dem Smoke-Test.
+**Lösung:** Die im Log genannte URL im Browser öffnen. Prüfen, ob `games/word-search/` und `data/vocabulary/a1.json` erreichbar sind. Ein Deploy-Fehler vorher hat Vorrang vor dem Smoke-Test.
 
 ## Generator meldet „nicht erzeugt“
 
