@@ -14,7 +14,7 @@ Je GER-Niveau gibt es eine Datei (`a1.json` … `c2.json`) mit einem JSON-Array.
 |-------------|-----|---------|--------------|
 | `english` | string | Ja | Englischer Begriff in Originalschreibweise, z. B. „apple“, „to eat“, „train station“. Eindeutig (ohne Groß-/Kleinschreibung). |
 | `german` | string | Ja | Deutsche Übersetzung. |
-| `partOfSpeech` | string | Ja | Wortart, z. B. `noun`, `verb`, `adjective`, `adverb`, `other`. |
+| `partOfSpeech` | string | Ja | Wortart: `noun`, `verb`, `adjective`, `adverb`, `preposition`, `conjunction` oder `pronoun`. Verben stehen als Infinitiv mit „to“ (außer Modalverben wie „can“). |
 | `topic` | string | Ja | Thema auf Deutsch, z. B. „Essen“, „Arbeit“. |
 | `synonyms` | string[] | Ja | Deutsche Synonyme, ggf. leer. |
 | `exampleGerman` | string | Ja | Beispielsatz auf Deutsch. |

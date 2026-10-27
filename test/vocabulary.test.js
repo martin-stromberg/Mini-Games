@@ -22,6 +22,17 @@ test('every real vocabulary entry is complete, including German and English exam
   assert.deepEqual(incomplete.map(entry => entry.english), []);
 });
 
+test('every real vocabulary entry has a specific part of speech', () => {
+  const parts = new Set(['noun', 'verb', 'adjective', 'adverb', 'preposition', 'conjunction', 'pronoun']);
+  assert.deepEqual(vocabulary.filter(entry => !parts.has(entry.partOfSpeech)).map(entry => entry.english), []);
+});
+
+test('verbs are stored as infinitive with "to", except modal verbs', () => {
+  const modals = new Set(['can', 'could', 'may', 'might', 'must', 'shall', 'should', 'will', 'would']);
+  const withoutTo = vocabulary.filter(entry => entry.partOfSpeech === 'verb' && !/^to\s/i.test(entry.english) && !modals.has(entry.english));
+  assert.deepEqual(withoutTo.map(entry => entry.english), []);
+});
+
 test('real vocabulary keeps phrases that do not fit into the grid', () => {
   assert.ok(vocabulary.some(entry => entry.english.includes(' ') && !entry.english.toLowerCase().startsWith('to ')));
 });
