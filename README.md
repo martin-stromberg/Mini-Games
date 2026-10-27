@@ -74,7 +74,8 @@ Die Vokabeln liegen lokal in `public/data/vocabulary.json` als JSON-Array. Jeder
 ```
 
 - `level` ist eines von `A1`, `A2`, `B1`, `B2`, `C1`, `C2`.
-- Der Bestand umfasst aktuell 61 Einträge, je Niveau mindestens zehn.
+- Der Bestand umfasst aktuell 2316 Einträge (A1 115, A2 99, B1 106, B2 713, C1 1175, C2 108).
+- Neue Vokabeln lassen sich mit `node scripts/import-vocabulary.mjs <ordner>` aus Dateien `a1.json` … `c2.json` (Felder `Question` = deutsch, `Answer` = englisch) übernehmen. Das Skript entfernt ein führendes „to“ bei Verben, überspringt Wortgruppen, Begriffe mit Bindestrich und Begriffe außerhalb von 2–13 Buchstaben sowie bereits vorhandene englische Wörter und deutsche Übersetzungen. Am Ende prüft es den Bestand mit `validateVocabulary`.
 - Die Tests in `test/vocabulary.test.js` prüfen das Schema, die Niveaus und die Eindeutigkeit der Begriffe. Die Wortlänge muss zwischen 2 und 13 Buchstaben liegen, damit die Wörter in das Gitter passen.
 
 ## Projektstruktur

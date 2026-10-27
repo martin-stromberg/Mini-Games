@@ -17,7 +17,9 @@ Die Datei ist ein JSON-Array. Jeder Eintrag hat folgende Eigenschaften:
 | `level` | string | Ja | GER-Niveau: `A1`, `A2`, `B1`, `B2`, `C1` oder `C2`. |
 | `id` | string | Nein | Stabile ID. Fehlt sie, wird `vocab-<Index>` vergeben. |
 
-Der Bestand umfasst 61 Einträge: A1 mit 11, jeweils A2, B1, B2, C1 und C2 mit je 10 Einträgen.
+Der Bestand umfasst 2316 Einträge: A1 115, A2 99, B1 106, B2 713, C1 1175, C2 108. Deutsche Übersetzungen sind im Bestand eindeutig, damit in einer Runde keine zwei gleich lautenden Übersetzungen erscheinen.
+
+Neue Vokabeln lassen sich mit `node scripts/import-vocabulary.mjs <ordner>` aus Dateien `a1.json` … `c2.json` (Felder `Question` = deutsch, `Answer` = englisch) übernehmen. Das Skript entfernt ein führendes „to“ bei Verben, überspringt Wortgruppen, Begriffe mit Bindestrich und Begriffe außerhalb von 2–13 Buchstaben sowie bereits vorhandene englische Wörter und deutsche Übersetzungen. Am Ende prüft es den Bestand mit `validateVocabulary`.
 
 Die Validierung (`validateVocabulary` in `src/word-search/game.js`) lehnt Nicht-Arrays, Nicht-Objekte, ungültige Wörter, leere Übersetzungen, unbekannte Niveaus und doppelte Wörter mit einer Meldung ab, die den Eintrag nennt.
 
