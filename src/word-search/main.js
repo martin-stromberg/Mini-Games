@@ -1,4 +1,7 @@
-import { DIFFICULTY, LEVELS, SIZE, STORAGE_KEY, WORDS_PER_ROUND, classifySlots, coordKey, generateRound, getHint, parseKey, seededRandom, straightPath, toPuzzleWords, toSortedCellKeys, validateVocabulary, vocabularyFile } from './game.js';
+import { DIFFICULTY, LEVELS, SIZE, STORAGE_KEY, WORDS_PER_ROUND, classifySlots, coordKey, generateRound, getHint, parseKey, straightPath, toPuzzleWords, toSortedCellKeys, validateVocabulary } from './game.js';
+import { escapeHtml } from '../shared/html.js';
+import { createRandomSource } from '../shared/random.js';
+import { loadVocabulary } from '../shared/vocabulary.js';
 
 const app = document.querySelector('#app');
 const FOCUS_ATTRIBUTES = ['data-cell', 'data-action', 'data-edit', 'data-drag-replace', 'data-remove', 'data-translation'];
@@ -8,11 +11,6 @@ const ARROW_STEPS = { ArrowLeft: [0, -1], ArrowRight: [0, 1], ArrowUp: [-1, 0], 
 const emptySlots = () => Array(WORDS_PER_ROUND).fill(null);
 const emptyAssignments = () => Array(WORDS_PER_ROUND).fill(null);
 const emptyDraft = () => ({ cells: new Set(), editingIndex: null, dragReplaceIndex: null });
-
-function createRandomSource() {
-  const seed = new URLSearchParams(window.location.search).get('seed');
-  return seed !== null && seed.trim() !== '' && Number.isFinite(Number(seed)) ? seededRandom(Number(seed)) : Math.random;
-}
 
 const state = {
   vocabulary: [],
@@ -31,10 +29,6 @@ const state = {
   focusCell: '0,0',
   rng: createRandomSource()
 };
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
-}
 
 function readStoredLevels() {
   try { return localStorage.getItem(STORAGE_KEY); } catch { return null; }
@@ -541,20 +535,10 @@ function bindGameEvents() {
   board.addEventListener('focusin', handleBoardFocus);
 }
 
-async function loadLevelFile(level) {
-  const response = await fetch(`${import.meta.env.BASE_URL}${vocabularyFile(level)}`);
-  if (!response.ok) throw new Error(`Die Vokabeldatei für ${level} konnte nicht geladen werden.`);
-  const entries = await response.json();
-  if (!Array.isArray(entries)) throw new Error(`Die Vokabeldatei für ${level} enthält keine Liste.`);
-  return entries.map(entry => ({ ...entry, level }));
-}
-
-const loadVocabulary = async () => (await Promise.all(LEVELS.map(loadLevelFile))).flat();
-
 async function initialise() {
   state.selectedLevels = loadLevels();
   try {
-    state.vocabulary = toPuzzleWords(validateVocabulary(await loadVocabulary()));
+    state.vocabulary = toPuzzleWords(validateVocabulary(await loadVocabulary(import.meta.env.BASE_URL)));
     renderSetup();
   } catch (error) {
     app.innerHTML = `<p class="notice warning" role="alert">${escapeHtml(error.message)}</p>`;

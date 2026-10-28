@@ -20,3 +20,15 @@ test('published game loads assets and vocabulary, shows levels and starts a roun
   await expect(page.locator('.cell')).toHaveCount(SIZE * SIZE);
   await expect(page.locator('.translations li')).toHaveCount(WORDS_PER_ROUND);
 });
+
+test('published memory game starts a round and shows a symbol image', async ({ page }) => {
+  await page.goto('./');
+  await page.getByRole('link', { name: 'Vokabel-Memory' }).click();
+  await expect(page.getByRole('heading', { name: 'Memory' })).toBeVisible();
+  await page.getByRole('button', { name: 'Runde starten' }).click();
+  await expect(page.locator('[data-card]')).toHaveCount(16);
+  const imageCard = page.locator('.card-image').first();
+  await imageCard.click();
+  await expect(imageCard.locator('img')).toBeVisible();
+  await expect.poll(() => imageCard.locator('img').evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true);
+});
