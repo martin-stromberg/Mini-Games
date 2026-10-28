@@ -1,6 +1,11 @@
+import { LEVELS, germanKey, validateVocabulary, vocabularyFile } from '../shared/vocabulary.js';
+import { seededRandom, shuffle } from '../shared/random.js';
+
+// Gemeinsame Bausteine bleiben hier verfügbar, damit Tests und Skripte sie weiter aus game.js beziehen können.
+export { LEVELS, germanKey, seededRandom, validateVocabulary, vocabularyFile };
+
 export const SIZE = 13;
 export const MIN_WORD_LENGTH = 2;
-export const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 export const WORDS_PER_ROUND = 10;
 export const MAX_GENERATION_ATTEMPTS = 120;
 export const DIFFICULTY = Object.freeze({ EASY: 'easy', HARD: 'hard' });
@@ -20,25 +25,6 @@ export const WORD_PATTERN = new RegExp(`^[A-Z]{${MIN_WORD_LENGTH},${SIZE}}$`);
 export const normalizeWord = word => String(word || '').trim().toUpperCase();
 // Englische Verben stehen im Bestand als Infinitiv mit „to“; im Gitter steht nur das Verb.
 export const toGridWord = english => normalizeWord(String(english || '').trim().replace(/^to\s+/i, ''));
-export const germanKey = german => String(german || '').trim().toLocaleLowerCase('de');
-export const vocabularyFile = level => `data/vocabulary/${level.toLowerCase()}.json`;
-
-// Prüft den vollständigen Vokabelbestand (alle Spiele). Ein Eintrag braucht Englisch, Deutsch und ein GER-Niveau;
-// Wortgruppen sind erlaubt. Englische Begriffe sind eindeutig.
-export function validateVocabulary(vocabulary) {
-  if (!Array.isArray(vocabulary)) throw new Error('Die Vokabeldatei enthält keine Liste.');
-  const seen = new Set();
-  vocabulary.forEach((entry, index) => {
-    if (!entry || typeof entry !== 'object') throw new Error(`Vokabeleintrag ${index + 1} ist kein Objekt.`);
-    if (typeof entry.english !== 'string' || !entry.english.trim()) throw new Error(`Fehlender englischer Begriff in Eintrag ${index + 1}.`);
-    const english = entry.english.trim().toLowerCase();
-    if (typeof entry.german !== 'string' || !entry.german.trim()) throw new Error(`Fehlende deutsche Übersetzung in Eintrag ${index + 1}: ${english}`);
-    if (!LEVELS.includes(entry.level)) throw new Error(`Ungültiges GER-Niveau in Eintrag ${index + 1}: ${english}`);
-    if (seen.has(english)) throw new Error(`Doppelter englischer Begriff: ${english}`);
-    seen.add(english);
-  });
-  return vocabulary.map((entry, index) => ({ ...entry, id: entry.id || `vocab-${index}`, english: entry.english.trim(), german: entry.german.trim() }));
-}
 
 // Wählt die Einträge, die als Wort ins Gitter passen. `english` ist danach das Gitterwort (A–Z, Großbuchstaben).
 export function toPuzzleWords(vocabulary) {
@@ -64,19 +50,6 @@ function pickWords(pool, rng, count) {
   return chosen;
 }
 
-export function seededRandom(seed = Date.now()) {
-  let state = (Number(seed) >>> 0) || 1;
-  return () => ((state = (state * 1664525 + 1013904223) >>> 0) / 4294967296);
-}
-
-function shuffle(items, rng) {
-  const result = [...items];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
-}
 
 const directionsFor = difficulty => difficulty === DIFFICULTY.HARD ? [[0, 1], [1, 0], [1, 1], [1, -1]] : [[0, 1], [1, 0]];
 

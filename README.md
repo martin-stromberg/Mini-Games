@@ -2,7 +2,7 @@
 
 [![Verify and deploy Pages](https://img.shields.io/github/actions/workflow/status/martin-stromberg/Mini-Games/pages.yml?label=Pages)](https://github.com/martin-stromberg/Mini-Games/actions/workflows/pages.yml)
 
-Eine kleine, statische Sammlung von Lernspielen, veröffentlicht über GitHub Pages. Das erste Spiel ist ein **Wortsuchrätsel** zum Üben englischer Vokabeln mit deutschen Übersetzungen, sortiert nach GER-Niveau (A1 bis C2).
+Eine kleine, statische Sammlung von Lernspielen, veröffentlicht über GitHub Pages. Zum Üben englischer Vokabeln gibt es ein **Wortsuchrätsel** mit deutschen Übersetzungen, sortiert nach GER-Niveau (A1 bis C2), und ein **Vokabel-Memory** mit Symbolbildern.
 
 Die Seite ist so angelegt, dass weitere Spiele unter `games/<spielname>/` ergänzt werden können.
 
@@ -15,6 +15,7 @@ Die Seite ist so angelegt, dass weitere Spiele unter `games/<spielname>/` ergän
 - **Lösen-Button** prüft die Markierungen; nicht gefundene Übersetzungen werden danach hervorgehoben
 - **Tipp-Button** kreist ein falsch markiertes Feld oder, falls keines falsch ist, ein noch nicht gefundenes Feld eines korrekten Wortes ein
 - Zufällige Füllbuchstaben in allen nicht belegten Feldern
+- **Vokabel-Memory:** je Vokabel eine Bild- und eine Wortkarte; 6 bis 12 Paare, Wortkarten auf Englisch oder Deutsch, Niveauauswahl für alle Niveaus mit Bildern. Einstellungen bleiben im Browser gespeichert. Details: [docs/help/memory](docs/help/memory/index.md)
 
 ## Installation
 
@@ -40,7 +41,7 @@ Entwicklungsserver starten (Vite, Standardport 5173):
 npm run dev
 ```
 
-Anschließend im Browser `http://localhost:5173/games/word-search/` öffnen. Die Übersicht liegt unter `http://localhost:5173/`.
+Anschließend im Browser `http://localhost:5173/games/word-search/` bzw. `http://localhost:5173/games/memory/` öffnen. Die Übersicht liegt unter `http://localhost:5173/`.
 
 Produktionsbuild erzeugen und lokal ausliefern:
 
@@ -88,12 +89,17 @@ Die Vokabeln liegen je GER-Niveau in `public/data/vocabulary/a1.json` … `c2.js
 .
 ├── index.html                  # Übersicht der Spiele (Startseite)
 ├── games/
-│   └── word-search/index.html  # Wortsuchrätsel (Einstiegsseite)
+│   ├── word-search/index.html  # Wortsuchrätsel (Einstiegsseite)
+│   └── memory/index.html       # Vokabel-Memory (Einstiegsseite)
 ├── src/
 │   ├── styles.css              # Gemeinsame Styles
-│   └── word-search/
-│       ├── game.js             # Generator, Klassifikation, Tipp (ohne DOM)
-│       └── main.js             # Oberfläche des Wortsuchrätsels
+│   ├── shared/                 # Vokabeln laden und prüfen, Zufall, HTML-Escaping (für alle Spiele)
+│   ├── word-search/
+│   │   ├── game.js             # Generator, Klassifikation, Tipp (ohne DOM)
+│   │   └── main.js             # Oberfläche des Wortsuchrätsels
+│   └── memory/
+│       ├── game.js             # Rundenauswahl und Aufdecken (ohne DOM)
+│       └── main.js             # Oberfläche des Memorys
 ├── public/data/vocabulary/    # Vokabeldaten je Niveau (a1.json … c2.json)
 ├── public/images/vocabulary/  # Symbolbilder der Vokabeln (SVG) mit LIZENZEN.md
 ├── test/                       # Unit-Tests (Node-Testrunner)
@@ -110,7 +116,7 @@ Technologien: Vanilla JavaScript (ES-Module), HTML und CSS, Build mit Vite 7, Te
 
 | Befehl | Inhalt |
 |--------|--------|
-| `npm test` | Unit-Tests in `test/` (Node-Testrunner): Vokabeldaten, Generator, Klassifikation, Ziehen, Tipp |
+| `npm test` | Unit-Tests in `test/` (Node-Testrunner): Vokabeldaten, Generator, Klassifikation, Ziehen, Tipp, Memory-Logik |
 | `npm run test:e2e` | Playwright-Tests in `e2e/` gegen den Produktionsbuild unter dem Projekt-Unterpfad |
 | `npm run test:smoke` | Smoke-Test in `smoke/` gegen die veröffentlichte Seite; benötigt `PAGE_URL` |
 
@@ -122,7 +128,7 @@ Der Workflow `.github/workflows/pages.yml` läuft bei Pull Requests und bei Push
 
 1. **verify** (bei jedem Lauf): `npm ci`, `npm test`, `npm run test:e2e`, `npm run build`. Bei Pushes wird `dist/` als Pages-Artefakt hochgeladen.
 2. **deploy** (nur bei Push): veröffentlicht das Artefakt über `actions/deploy-pages`.
-3. **smoke** (nur bei Push): prüft die veröffentlichte URL (Übersicht, Spielseite, `data/vocabulary/a1.json`) und führt `npm run test:smoke` aus.
+3. **smoke** (nur bei Push): prüft die veröffentlichte URL (Übersicht, beide Spielseiten, `data/vocabulary/a1.json`) und führt `npm run test:smoke` aus.
 
 Voraussetzung in den Repository-Einstellungen: Unter *Settings → Pages* muss als Quelle **GitHub Actions** gewählt sein. Pull Requests veröffentlichen nichts.
 
