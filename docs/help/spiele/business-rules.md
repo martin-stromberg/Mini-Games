@@ -7,12 +7,12 @@
 **Beschreibung:** Eine Runde verwendet genau zehn verschiedene Wörter aus den aktivierten Niveaus.
 
 **Bedingungen:**
-- Der Pool umfasst nur Einträge, deren Niveau ausgewählt ist.
-- Der Pool muss mindestens zehn Einträge haben.
+- Der Pool umfasst nur Gitterwörter (siehe [Datenmodell](datenmodell.md)), deren Niveau ausgewählt ist.
+- Die zehn Wörter einer Runde haben unterschiedliche deutsche Übersetzungen (ohne Groß-/Kleinschreibung), damit jede Übersetzung eindeutig zugeordnet werden kann.
 
 **Verhalten:**
-- Wenn der Pool kleiner als zehn ist: Fehler mit Anzahl und Mindestbedarf. Es wird nie aus deaktivierten Niveaus ergänzt.
-- Sonst: zehn Einträge werden per Fisher-Yates-Mischung zufällig ausgewählt.
+- Der Pool wird per Fisher-Yates-Mischung gemischt; der Reihe nach werden Wörter übernommen, deren Übersetzung noch nicht gewählt ist, bis zehn erreicht sind.
+- Kommen keine zehn Wörter zusammen: Fehler mit Anzahl und Mindestbedarf. Es wird nie aus deaktivierten Niveaus ergänzt.
 
 **Umsetzung:** `generateRound`, `shuffle` in `src/word-search/game.js`.
 

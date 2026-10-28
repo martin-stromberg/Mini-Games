@@ -67,16 +67,18 @@ VITE_BASE_PATH=/Mini-Games/ npm run build
 
 ## Vokabeldaten
 
-Die Vokabeln liegen lokal in `public/data/vocabulary.json` als JSON-Array. Jeder Eintrag hat drei Felder:
+Die Vokabeln liegen je GER-Niveau in `public/data/vocabulary/a1.json` … `c2.json` als JSON-Array. Sie sind für alle Spiele gedacht und enthalten neben der Übersetzung auch Wortart, Thema, Synonyme und einen Beispielsatz auf Deutsch und Englisch:
 
 ```json
-{ "english": "APPLE", "german": "Apfel", "level": "A1" }
+{ "english": "apple", "german": "Apfel", "partOfSpeech": "noun", "topic": "Essen", "synonyms": [],
+  "exampleGerman": "Der Apfel schmeckt süß.", "exampleEnglish": "The apple tastes sweet." }
 ```
 
-- `level` ist eines von `A1`, `A2`, `B1`, `B2`, `C1`, `C2`.
-- Der Bestand umfasst aktuell 2316 Einträge (A1 115, A2 99, B1 106, B2 713, C1 1175, C2 108).
-- Neue Vokabeln lassen sich mit `node scripts/import-vocabulary.mjs <ordner>` aus Dateien `a1.json` … `c2.json` (Felder `Question` = deutsch, `Answer` = englisch) übernehmen. Das Skript entfernt ein führendes „to“ bei Verben, überspringt Wortgruppen, Begriffe mit Bindestrich und Begriffe außerhalb von 2–13 Buchstaben sowie bereits vorhandene englische Wörter und deutsche Übersetzungen. Am Ende prüft es den Bestand mit `validateVocabulary`.
-- Die Tests in `test/vocabulary.test.js` prüfen das Schema, die Niveaus und die Eindeutigkeit der Begriffe. Die Wortlänge muss zwischen 2 und 13 Buchstaben liegen, damit die Wörter in das Gitter passen.
+- Das Niveau ergibt sich aus dem Dateinamen.
+- Der Bestand umfasst aktuell 2454 Einträge (A1 118, A2 105, B1 117, B2 743, C1 1262, C2 109). Verben stehen als Infinitiv mit „to“, Wortgruppen wie „train station“ sind enthalten.
+- Das Wortsuchrätsel nutzt davon nur Begriffe, die als Wort ins Gitter passen: „to“ wird bei Verben weggelassen, übrig bleiben nur A–Z mit 2–13 Buchstaben. Pro Runde wählt es zehn Wörter mit unterschiedlichen deutschen Übersetzungen.
+- Neue Vokabeln lassen sich mit `node scripts/import-vocabulary.mjs <ordner>` aus Dateien `a1.json` … `c2.json` (Felder `Question` = deutsch, `Answer` = englisch, `PartOfSpeech`, `Topic`, `Synonyms`, `ExampleSentence`, `ExampleSentenceTranslation`) übernehmen. Neue englische Begriffe werden ihrem Niveau angehängt; ist ein Begriff schon vorhanden („to improve“ und „improve“ gelten als gleich), bleibt er in seinem Niveau und fehlende Angaben werden ergänzt. Das Skript kann beliebig oft laufen und prüft den Bestand am Ende mit `validateVocabulary`.
+- Die Tests in `test/vocabulary.test.js` prüfen, dass jeder Eintrag vollständig ist, englische Begriffe eindeutig sind und jedes Niveau mindestens zehn Gitterwörter mit unterschiedlichen Übersetzungen bietet.
 
 ## Projektstruktur
 
@@ -90,7 +92,7 @@ Die Vokabeln liegen lokal in `public/data/vocabulary.json` als JSON-Array. Jeder
 │   └── word-search/
 │       ├── game.js             # Generator, Klassifikation, Tipp (ohne DOM)
 │       └── main.js             # Oberfläche des Wortsuchrätsels
-├── public/data/vocabulary.json # Vokabeldaten
+├── public/data/vocabulary/    # Vokabeldaten je Niveau (a1.json … c2.json)
 ├── test/                       # Unit-Tests (Node-Testrunner)
 ├── e2e/                        # End-to-End-Tests (Playwright, gegen den Produktionsbuild)
 ├── smoke/                      # Smoke-Test der veröffentlichten Seite (Playwright)
@@ -117,7 +119,7 @@ Der Workflow `.github/workflows/pages.yml` läuft bei Pull Requests und bei Push
 
 1. **verify** (bei jedem Lauf): `npm ci`, `npm test`, `npm run test:e2e`, `npm run build`. Bei Pushes wird `dist/` als Pages-Artefakt hochgeladen.
 2. **deploy** (nur bei Push): veröffentlicht das Artefakt über `actions/deploy-pages`.
-3. **smoke** (nur bei Push): prüft die veröffentlichte URL (Übersicht, Spielseite, `vocabulary.json`) und führt `npm run test:smoke` aus.
+3. **smoke** (nur bei Push): prüft die veröffentlichte URL (Übersicht, Spielseite, `data/vocabulary/a1.json`) und führt `npm run test:smoke` aus.
 
 Voraussetzung in den Repository-Einstellungen: Unter *Settings → Pages* muss als Quelle **GitHub Actions** gewählt sein. Pull Requests veröffentlichen nichts.
 

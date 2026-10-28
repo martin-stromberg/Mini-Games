@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { DIFFICULTY, LEVELS, MAX_GENERATION_ATTEMPTS, MIN_WORD_LENGTH, SIZE, WORDS_PER_ROUND, classifySlots, generateRound, seededRandom } from '../src/word-search/game.js';
-import { exactSlot, findSeed, roundFor, vocabulary } from './fixtures/rounds.js';
+import { exactSlot, findSeed, puzzleWords, roundFor } from './fixtures/rounds.js';
 
 const step = target => ({ dr: target.path[1].row - target.path[0].row, dc: target.path[1].col - target.path[0].col });
 
@@ -71,8 +71,20 @@ test('different seeds vary the word selection and the fill pattern', () => {
 });
 
 test('a pool with too few words ends with a clear error', () => {
-  const pool = vocabulary.slice(0, WORDS_PER_ROUND - 1);
+  const pool = puzzleWords.slice(0, WORDS_PER_ROUND - 1);
   assert.throws(() => generateRound(pool, LEVELS, DIFFICULTY.EASY, seededRandom(1)), new RegExp(`nur ${pool.length} geeignete Wörter.*mindestens ${WORDS_PER_ROUND}`));
+});
+
+test('a round never contains two equal German translations', () => {
+  for (const seed of [1, 2, 3, 4, 5]) {
+    const germans = roundFor(seed).targets.map(target => target.german.toLocaleLowerCase('de'));
+    assert.equal(new Set(germans).size, WORDS_PER_ROUND);
+  }
+});
+
+test('words with an already chosen German translation do not count towards the round', () => {
+  const pool = puzzleWords.slice(0, WORDS_PER_ROUND).map((word, index) => index === 1 ? { ...word, german: puzzleWords[0].german } : word);
+  assert.throws(() => generateRound(pool, LEVELS, DIFFICULTY.EASY, seededRandom(1)), new RegExp(`nur ${WORDS_PER_ROUND - 1} geeignete Wörter`));
 });
 
 test('deactivated levels are never used to fill up a round', () => {

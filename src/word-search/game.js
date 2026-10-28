@@ -18,20 +18,50 @@ export const toSortedCellKeys = cells => [...new Set([...cells].map(cell => type
 });
 export const WORD_PATTERN = new RegExp(`^[A-Z]{${MIN_WORD_LENGTH},${SIZE}}$`);
 export const normalizeWord = word => String(word || '').trim().toUpperCase();
+// Englische Verben stehen im Bestand als Infinitiv mit „to“; im Gitter steht nur das Verb.
+export const toGridWord = english => normalizeWord(String(english || '').trim().replace(/^to\s+/i, ''));
+export const germanKey = german => String(german || '').trim().toLocaleLowerCase('de');
+export const vocabularyFile = level => `data/vocabulary/${level.toLowerCase()}.json`;
 
+// Prüft den vollständigen Vokabelbestand (alle Spiele). Ein Eintrag braucht Englisch, Deutsch und ein GER-Niveau;
+// Wortgruppen sind erlaubt. Englische Begriffe sind eindeutig.
 export function validateVocabulary(vocabulary) {
   if (!Array.isArray(vocabulary)) throw new Error('Die Vokabeldatei enthält keine Liste.');
   const seen = new Set();
   vocabulary.forEach((entry, index) => {
     if (!entry || typeof entry !== 'object') throw new Error(`Vokabeleintrag ${index + 1} ist kein Objekt.`);
-    const word = normalizeWord(entry.english);
-    if (typeof entry.english !== 'string' || !WORD_PATTERN.test(word)) throw new Error(`Ungültiges englisches Wort in Eintrag ${index + 1}: ${entry.english}`);
-    if (typeof entry.german !== 'string' || !entry.german.trim()) throw new Error(`Fehlende deutsche Übersetzung in Eintrag ${index + 1}: ${word}`);
-    if (!LEVELS.includes(entry.level)) throw new Error(`Ungültiges GER-Niveau in Eintrag ${index + 1}: ${word}`);
-    if (seen.has(word)) throw new Error(`Doppeltes englisches Wort: ${word}`);
-    seen.add(word);
+    if (typeof entry.english !== 'string' || !entry.english.trim()) throw new Error(`Fehlender englischer Begriff in Eintrag ${index + 1}.`);
+    const english = entry.english.trim().toLowerCase();
+    if (typeof entry.german !== 'string' || !entry.german.trim()) throw new Error(`Fehlende deutsche Übersetzung in Eintrag ${index + 1}: ${english}`);
+    if (!LEVELS.includes(entry.level)) throw new Error(`Ungültiges GER-Niveau in Eintrag ${index + 1}: ${english}`);
+    if (seen.has(english)) throw new Error(`Doppelter englischer Begriff: ${english}`);
+    seen.add(english);
   });
-  return vocabulary.map((entry, index) => ({ ...entry, id: entry.id || `vocab-${index}`, english: normalizeWord(entry.english), german: entry.german.trim() }));
+  return vocabulary.map((entry, index) => ({ ...entry, id: entry.id || `vocab-${index}`, english: entry.english.trim(), german: entry.german.trim() }));
+}
+
+// Wählt die Einträge, die als Wort ins Gitter passen. `english` ist danach das Gitterwort (A–Z, Großbuchstaben).
+export function toPuzzleWords(vocabulary) {
+  const seen = new Set();
+  return vocabulary.flatMap(entry => {
+    const word = toGridWord(entry.english);
+    if (!WORD_PATTERN.test(word) || seen.has(word)) return [];
+    seen.add(word);
+    return [{ ...entry, english: word }];
+  });
+}
+
+// Zieht bis zu `count` Wörter mit unterschiedlichen deutschen Übersetzungen, damit jede Übersetzung eindeutig zuordenbar ist.
+function pickWords(pool, rng, count) {
+  const usedGerman = new Set();
+  const chosen = [];
+  for (const item of shuffle(pool, rng)) {
+    if (usedGerman.has(germanKey(item.german))) continue;
+    usedGerman.add(germanKey(item.german));
+    chosen.push(item);
+    if (chosen.length === count) break;
+  }
+  return chosen;
 }
 
 export function seededRandom(seed = Date.now()) {
@@ -76,10 +106,9 @@ function tryPlaceWords(chosen, directions, rng, size) {
 }
 
 export function generateRound(vocabulary, selectedLevels = LEVELS, difficulty = DIFFICULTY.EASY, rng = Math.random, { size = SIZE } = {}) {
-  const valid = validateVocabulary(vocabulary);
-  const pool = valid.filter(item => selectedLevels.includes(item.level));
-  if (pool.length < WORDS_PER_ROUND) throw new Error(`Für die Auswahl stehen nur ${pool.length} geeignete Wörter bereit; mindestens ${WORDS_PER_ROUND} sind nötig.`);
-  const chosen = shuffle(pool, rng).slice(0, WORDS_PER_ROUND);
+  const pool = toPuzzleWords(validateVocabulary(vocabulary)).filter(item => selectedLevels.includes(item.level));
+  const chosen = pickWords(pool, rng, WORDS_PER_ROUND);
+  if (chosen.length < WORDS_PER_ROUND) throw new Error(`Für die Auswahl stehen nur ${chosen.length} geeignete Wörter bereit; mindestens ${WORDS_PER_ROUND} sind nötig.`);
   const directions = directionsFor(difficulty);
   for (let attempt = 0; attempt < MAX_GENERATION_ATTEMPTS; attempt++) {
     const placement = tryPlaceWords(chosen, directions, rng, size);

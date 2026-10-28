@@ -4,7 +4,7 @@
 
 ## Übersicht
 
-Die Seite `games/word-search/index.html` lädt die Oberfläche aus `src/word-search/main.js`. Die Spiellogik (Validierung, Generator, Klassifikation, Tipp, Geradenprüfung) liegt in `src/word-search/game.js` ohne DOM-Zugriff. Die Vokabeln werden zur Laufzeit aus `public/data/vocabulary.json` geladen. Die Oberfläche wird bei jedem Zustandswechsel vollständig neu gerendert.
+Die Seite `games/word-search/index.html` lädt die Oberfläche aus `src/word-search/main.js`. Die Spiellogik (Validierung, Generator, Klassifikation, Tipp, Geradenprüfung) liegt in `src/word-search/game.js` ohne DOM-Zugriff. Die Vokabeln werden zur Laufzeit aus `public/data/vocabulary/<niveau>.json` geladen. Die Oberfläche wird bei jedem Zustandswechsel vollständig neu gerendert.
 
 ## Ablauf
 
@@ -12,8 +12,8 @@ Die Seite `games/word-search/index.html` lädt die Oberfläche aus `src/word-sea
 
 `initialise()` in `main.js`:
 - `loadLevels()` liest die gespeicherte Niveauauswahl aus dem Browser-Speicher (Schlüssel `mini-games.word-search.levels`). Ungültige oder leere Werte werden durch alle Niveaus ersetzt und zurückgeschrieben.
-- Die Vokabeldatei wird über `import.meta.env.BASE_URL` mit dem Pfad `data/vocabulary.json` geladen.
-- `validateVocabulary()` (`game.js`) prüft und normalisiert die Einträge. Bei Fehlern wird die Fehlermeldung im `#app`-Bereich angezeigt.
+- Die sechs Vokabeldateien werden parallel über `import.meta.env.BASE_URL` und `vocabularyFile(level)` (`data/vocabulary/a1.json` …) geladen; jeder Eintrag erhält das Niveau seiner Datei.
+- `validateVocabulary()` (`game.js`) prüft den Bestand, `toPuzzleWords()` bildet daraus die Gitterwörter. Bei Fehlern wird die Fehlermeldung im `#app`-Bereich angezeigt.
 - `renderSetup()` zeigt die Niveau-Checkboxen, die Schwierigkeit und den Startbutton.
 
 Beteiligte Komponenten:
@@ -26,7 +26,7 @@ Beteiligte Komponenten:
 `startRound(difficulty)` ruft `generateRound(vocabulary, selectedLevels, difficulty, rng)` auf und setzt `slots`, Entwurf und Ergebnis zurück. Ein Fehler des Generators wird als Meldung angezeigt und führt zurück zur Setup-Ansicht.
 
 `generateRound` (`game.js`):
-- Filtert den Pool nach Niveau und wählt mit `shuffle` zehn Einträge.
+- Filtert die Gitterwörter nach Niveau und wählt mit `pickWords` (gemischt per `shuffle`) zehn Wörter mit unterschiedlichen deutschen Übersetzungen.
 - `tryPlaceWords` platziert die Wörter, längste zuerst, über `placementCandidates` aus den zulässigen Richtungen (`directionsFor`: Einfach = `[0,1]`, `[1,0]`; Schwierig zusätzlich `[1,1]`, `[1,-1]`).
 - Bis zu `MAX_GENERATION_ATTEMPTS` (120) Versuche; danach Fehler.
 - Freie Zellen werden mit Zufallsbuchstaben A–Z gefüllt.
