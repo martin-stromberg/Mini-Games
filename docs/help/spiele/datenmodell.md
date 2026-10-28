@@ -19,6 +19,7 @@ Je GER-Niveau gibt es eine Datei (`a1.json` … `c2.json`) mit einem JSON-Array.
 | `synonyms` | string[] | Ja | Deutsche Synonyme, ggf. leer. |
 | `exampleGerman` | string | Ja | Beispielsatz auf Deutsch. |
 | `exampleEnglish` | string | Ja | Derselbe Beispielsatz auf Englisch. |
+| `image` | string | Nein | Symbolbild für Gegenstände und Lebewesen, Pfad relativ zu `public/`, z. B. `images/vocabulary/dog.svg`. Nur bei Substantiven. Die Bilder werden als `<img>` angezeigt; Herkunft und Lizenzen stehen in `public/images/vocabulary/LIZENZEN.md`. |
 
 Das Niveau steht nicht im Eintrag, sondern ergibt sich aus der Datei. Beim Laden ergänzt das Spiel `level` und eine `id` (`vocab-<Index>`).
 

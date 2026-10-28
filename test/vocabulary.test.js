@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { existsSync, readFileSync } from 'node:fs';
 import { LEVELS, MIN_WORD_LENGTH, SIZE, WORD_PATTERN, WORDS_PER_ROUND, germanKey, toGridWord, toPuzzleWords, validateVocabulary } from '../src/word-search/game.js';
 import { levelFiles, puzzleWords, vocabulary } from './fixtures/rounds.js';
 
@@ -31,6 +32,26 @@ test('verbs are stored as infinitive with "to", except modal verbs', () => {
   const modals = new Set(['can', 'could', 'may', 'might', 'must', 'shall', 'should', 'will', 'would']);
   const withoutTo = vocabulary.filter(entry => entry.partOfSpeech === 'verb' && !/^to\s/i.test(entry.english) && !modals.has(entry.english));
   assert.deepEqual(withoutTo.map(entry => entry.english), []);
+});
+
+test('symbol images belong to nouns and point to an existing SVG under images/vocabulary', () => {
+  const withImage = vocabulary.filter(entry => 'image' in entry);
+  assert.ok(withImage.length >= 100, `nur ${withImage.length} Einträge mit Symbolbild`);
+  for (const entry of withImage) {
+    assert.equal(entry.partOfSpeech, 'noun', entry.english);
+    assert.match(entry.image, /^images\/vocabulary\/[a-z-]+\.svg$/, entry.english);
+    const file = new URL(`../public/${entry.image}`, import.meta.url);
+    assert.ok(existsSync(file), `Bild fehlt: ${entry.image}`);
+  }
+});
+
+test('symbol images contain no scripts, event handlers or external references', () => {
+  const unsafe = /<script|javascript:|\son[a-z]+\s*=|<foreignObject|<iframe|<image|href="(https?:|data:)/i;
+  for (const entry of vocabulary.filter(item => item.image)) {
+    const svg = readFileSync(new URL(`../public/${entry.image}`, import.meta.url), 'latin1');
+    assert.match(svg, /<svg[\s>]/, entry.image);
+    assert.doesNotMatch(svg, unsafe, entry.image);
+  }
 });
 
 test('real vocabulary keeps phrases that do not fit into the grid', () => {

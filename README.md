@@ -71,14 +71,16 @@ Die Vokabeln liegen je GER-Niveau in `public/data/vocabulary/a1.json` … `c2.js
 
 ```json
 { "english": "apple", "german": "Apfel", "partOfSpeech": "noun", "topic": "Essen", "synonyms": [],
-  "exampleGerman": "Der Apfel schmeckt süß.", "exampleEnglish": "The apple tastes sweet." }
+  "exampleGerman": "Der Apfel schmeckt süß.", "exampleEnglish": "The apple tastes sweet.",
+  "image": "images/vocabulary/apple.svg" }
 ```
 
 - Das Niveau ergibt sich aus dem Dateinamen.
+- Gegenstände und Lebewesen können ein Symbolbild haben (`image`, Pfad relativ zu `public/`). Aktuell haben 109 Substantive aus A1 und A2 eins. Die SVGs liegen in `public/images/vocabulary/` und werden als `<img>` eingebunden, nie als eingebetteter Code. Herkunft und Lizenzen (Noto Emoji, Apache 2.0, sowie eigene Zeichnungen) stehen in `public/images/vocabulary/LIZENZEN.md`.
 - Der Bestand umfasst aktuell 2454 Einträge (A1 118, A2 105, B1 117, B2 743, C1 1262, C2 109). Verben stehen als Infinitiv mit „to“, Wortgruppen wie „train station“ sind enthalten.
 - Das Wortsuchrätsel nutzt davon nur Begriffe, die als Wort ins Gitter passen: „to“ wird bei Verben weggelassen, übrig bleiben nur A–Z mit 2–13 Buchstaben. Pro Runde wählt es zehn Wörter mit unterschiedlichen deutschen Übersetzungen.
 - Neue Vokabeln lassen sich mit `node scripts/import-vocabulary.mjs <ordner>` aus Dateien `a1.json` … `c2.json` (Felder `Question` = deutsch, `Answer` = englisch, `PartOfSpeech`, `Topic`, `Synonyms`, `ExampleSentence`, `ExampleSentenceTranslation`) übernehmen. Neue englische Begriffe werden ihrem Niveau angehängt; ist ein Begriff schon vorhanden („to improve“ und „improve“ gelten als gleich), bleibt er in seinem Niveau und fehlende Angaben werden ergänzt. Das Skript kann beliebig oft laufen und prüft den Bestand am Ende mit `validateVocabulary`.
-- Die Tests in `test/vocabulary.test.js` prüfen, dass jeder Eintrag vollständig ist, englische Begriffe eindeutig sind und jedes Niveau mindestens zehn Gitterwörter mit unterschiedlichen Übersetzungen bietet.
+- Die Tests in `test/vocabulary.test.js` prüfen, dass jeder Eintrag vollständig ist, englische Begriffe eindeutig sind, Symbolbilder existieren und keinen ausführbaren Inhalt haben und jedes Niveau mindestens zehn Gitterwörter mit unterschiedlichen Übersetzungen bietet.
 
 ## Projektstruktur
 
@@ -93,6 +95,7 @@ Die Vokabeln liegen je GER-Niveau in `public/data/vocabulary/a1.json` … `c2.js
 │       ├── game.js             # Generator, Klassifikation, Tipp (ohne DOM)
 │       └── main.js             # Oberfläche des Wortsuchrätsels
 ├── public/data/vocabulary/    # Vokabeldaten je Niveau (a1.json … c2.json)
+├── public/images/vocabulary/  # Symbolbilder der Vokabeln (SVG) mit LIZENZEN.md
 ├── test/                       # Unit-Tests (Node-Testrunner)
 ├── e2e/                        # End-to-End-Tests (Playwright, gegen den Produktionsbuild)
 ├── smoke/                      # Smoke-Test der veröffentlichten Seite (Playwright)
