@@ -53,7 +53,7 @@ test.describe('Memory: Einstellungen', () => {
   test('the start is blocked when the selection has too few words with images', async ({ page }) => {
     const fewImages = levelFiles.A1.filter(entry => entry.image).slice(0, 5);
     await page.route('**/data/vocabulary/a1.json', route => route.fulfill({ json: fewImages }));
-    await page.route('**/data/vocabulary/a2.json', route => route.fulfill({ json: [] }));
+    for (const level of LEVELS.slice(1)) await page.route(`**/data/vocabulary/${level.toLowerCase()}.json`, route => route.fulfill({ json: [] }));
     await page.goto(MEMORY_PATH);
     await expect(page.locator('[data-setup-status]')).toHaveText('Für die gewählten Niveaus gibt es nur 5 Vokabeln mit Bild; für 8 Paare werden 8 benötigt.');
     await expect(page.getByRole('button', { name: 'Runde starten' })).toBeDisabled();

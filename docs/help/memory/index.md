@@ -2,7 +2,7 @@
 
 # Vokabel-Memory
 
-Im Memory findest du Paare aus einem Symbolbild und dem passenden Wort, z. B. das Bild eines Hundes und „dog“. Es spielen nur Vokabeln mit, für die es ein Symbolbild gibt (aktuell 109 Gegenstände und Lebewesen aus A1 und A2).
+Im Memory findest du Paare aus einem Symbolbild und dem passenden Wort, z. B. das Bild eines Hundes und „dog“. Es spielen nur Vokabeln mit, für die es ein Symbolbild gibt (aktuell 189 Gegenstände, Lebewesen und anschauliche Begriffe aus A1 bis C1).
 
 ## Für Anwender
 
