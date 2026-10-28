@@ -12,4 +12,4 @@ Die Dateien wurden unverändert übernommen und nur nach dem englischen Begriff 
 
 Diese Bilder wurden für das Projekt selbst gezeichnet und unterliegen der Lizenz des Projekts:
 
-`apartment.svg`, `board.svg`, `bridge.svg`, `cap.svg`, `lamp.svg`, `office.svg`, `passport.svg`, `pill.svg`, `skirt.svg`, `sugar.svg`, `table.svg`
+`ambulance.svg`, `apartment.svg`, `board.svg`, `bridge.svg`, `cap.svg`, `lamp.svg`, `office.svg`, `passport.svg`, `pill.svg`, `skirt.svg`, `sugar.svg`, `table.svg`
