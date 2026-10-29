@@ -1,3 +1,10 @@
+## 2026-10-29 — Kreuzworträtsel
+
+- Neues Spiel „Kreuzworträtsel" unter `games/crossword/`: Deutsche Übersetzungen bilden die Hinweise, englische Einzelwörter werden automatisch zu einem kompakten, zusammenhängenden Gitter verkreuzt.
+- Seeded Generator mit 8/12/15 Wörtern, regelkonformen Kreuzungen, eindeutigen deutschen Hinweisen und Gittern bis 18×18; Eingabe per Tastatur oder Touch, Richtungswechsel per Klick, Pfeiltasten/Backspace/Home/Ende zur Navigation.
+- „Prüfen" markiert falsche Felder, „Wort aufdecken" trägt das aktive Wort ein; GER-Niveaus und Wortanzahl bleiben in `localStorage` gespeichert.
+- Einstiegslink auf der Startseite, Hilfeseite `docs/help/crossword/`, Unit-Tests `test/crossword.test.js` und E2E-Tests `e2e/crossword.spec.js`; Smoke-Test ergänzt.
+
 ## 2026-10-29 — Wort raten
 
 - Neues Spiel „Wort raten" unter `games/wort-raten/`: Ein englisches Wort wird Buchstabe für Buchstabe erraten (Galgenmännchen-Prinzip); statt eines Galgens verliert eine Blume bei jedem Fehlversuch ein Blütenblatt.
