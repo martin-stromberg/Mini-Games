@@ -59,3 +59,12 @@ test('published word guessing starts a game with keys and slots', async ({ page 
   await expect(page.locator('[data-word] .guess-slot').first()).toBeVisible();
   await expect(page.locator('[data-flower]')).toBeVisible();
 });
+
+test('published crossword starts a round with clues and input cells', async ({ page }) => {
+  await page.goto('./');
+  await page.getByRole('link', { name: 'Kreuzworträtsel' }).click();
+  await expect(page.getByRole('heading', { name: 'Kreuzworträtsel' })).toBeVisible();
+  await page.getByRole('button', { name: 'Runde starten' }).click();
+  await expect(page.locator('.crossword-input').first()).toBeVisible();
+  await expect(page.locator('[data-clue]')).toHaveCount(12);
+});

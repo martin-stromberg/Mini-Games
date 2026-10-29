@@ -2,7 +2,7 @@
 
 [![Verify and deploy Pages](https://img.shields.io/github/actions/workflow/status/martin-stromberg/Mini-Games/pages.yml?label=Pages)](https://github.com/martin-stromberg/Mini-Games/actions/workflows/pages.yml)
 
-Eine kleine, statische Sammlung von Lernspielen, veröffentlicht über GitHub Pages. Zum Üben englischer Vokabeln gibt es ein **Wortsuchrätsel** mit deutschen Übersetzungen, sortiert nach GER-Niveau (A1 bis C2), ein **Vokabel-Memory** mit Symbolbildern und ein **Vokabel-Quiz** als Multiple Choice.
+Eine kleine, statische Sammlung von Lernspielen, veröffentlicht über GitHub Pages. Zum Üben englischer Vokabeln gibt es unter anderem ein **Wortsuchrätsel**, ein automatisch erzeugtes **Kreuzworträtsel** mit deutschen Hinweisen, ein **Vokabel-Memory** mit Symbolbildern und ein **Vokabel-Quiz** als Multiple Choice — sortiert nach GER-Niveau (A1 bis C2).
 
 Die Seite ist so angelegt, dass weitere Spiele unter `games/<spielname>/` ergänzt werden können.
 
@@ -19,6 +19,7 @@ Die Seite ist so angelegt, dass weitere Spiele unter `games/<spielname>/` ergän
 - **Vokabel-Quiz (Multiple Choice):** 10, 20 oder 30 Fragen pro Runde; Fragetypen englisch → deutsch, deutsch → englisch und Symbolbild → englisch, gemischt oder einzeln wählbar. Sofortige Rückmeldung mit Beispielsatz, Ergebnis mit Fehlerliste am Ende. Antworten per Klick, Touch oder Tasten 1–4. Details: [docs/help/vocab-quiz](docs/help/vocab-quiz/index.md)
 - **Buchstabensalat:** Die gemischten Buchstaben einer englischen Vokabel als Kacheln in die richtige Reihenfolge legen; Hinweis ist die deutsche Übersetzung (optional mit Symbolbild). 5, 10 oder 15 Wörter pro Runde, Wortlängen-Filter (kurz/mittel/lang), Hilfe „Buchstaben aufdecken", Auswertung am Rundenende. Eingabe per Klick, Touch oder Tastatur. Details: [docs/help/buchstabensalat](docs/help/buchstabensalat/index.md)
 - **Wort raten:** Ein englisches Wort wird Buchstabe für Buchstabe erraten (Galgenmännchen-Prinzip, kindgerecht als Blume, die Blütenblätter verliert). Bildschirmtastatur A–Z und physische Tastatur, zuschaltbarer Hinweis mit deutscher Übersetzung und Symbolbild, wählbare Fehlversuche (6/8/10) und Wortlängen-Filter, Zähler für gewonnene und verlorene Wörter der Sitzung. Details: [docs/help/wort-raten](docs/help/wort-raten/index.md)
+- **Kreuzworträtsel:** Pro Runde werden 8, 12 oder 15 englische Einzelwörter automatisch zu einem kompakten, zusammenhängenden Gitter verkreuzt; deutsche Übersetzungen sind die Hinweise. Eingabe per Tastatur oder Touch, Richtungswechsel per Klick, Pfeiltasten/Backspace zur Navigation, Prüfen markiert falsche Felder und „Wort aufdecken“ hilft pro Wort. Mit `?seed=` sind Runden reproduzierbar. Details: [docs/help/crossword](docs/help/crossword/index.md)
 
 ## Installation
 
@@ -44,7 +45,7 @@ Entwicklungsserver starten (Vite, Standardport 5173):
 npm run dev
 ```
 
-Anschließend im Browser `http://localhost:5173/games/word-search/`, `http://localhost:5173/games/memory/`, `http://localhost:5173/games/vocab-quiz/`, `http://localhost:5173/games/buchstabensalat/` bzw. `http://localhost:5173/games/wort-raten/` öffnen. Die Übersicht liegt unter `http://localhost:5173/`.
+Anschließend im Browser `http://localhost:5173/games/word-search/`, `http://localhost:5173/games/memory/`, `http://localhost:5173/games/vocab-quiz/`, `http://localhost:5173/games/buchstabensalat/`, `http://localhost:5173/games/wort-raten/` bzw. `http://localhost:5173/games/crossword/` öffnen. Die Übersicht liegt unter `http://localhost:5173/`.
 
 Produktionsbuild erzeugen und lokal ausliefern:
 
@@ -82,7 +83,7 @@ Die Vokabeln liegen je GER-Niveau in `public/data/vocabulary/a1.json` … `c2.js
 - Das Niveau ergibt sich aus dem Dateinamen.
 - Gegenstände und Lebewesen können ein Symbolbild haben (`image`, Pfad relativ zu `public/`). Aktuell haben 189 Substantive eins (A1 66, A2 55, B1 11, B2 40, C1 17; C2 enthält nur abstrakte Begriffe). Abstrakte Begriffe und Wörter, deren Bild leicht mit einem vorhandenen verwechselt würde, bekommen bewusst keins. Die SVGs liegen in `public/images/vocabulary/` und werden als `<img>` eingebunden, nie als eingebetteter Code. Herkunft und Lizenzen (Noto Emoji, Apache 2.0, sowie eigene Zeichnungen) stehen in `public/images/vocabulary/LIZENZEN.md`.
 - Der Bestand umfasst aktuell 2454 Einträge (A1 118, A2 105, B1 117, B2 743, C1 1262, C2 109). Verben stehen als Infinitiv mit „to“, Wortgruppen wie „train station“ sind enthalten.
-- Das Wortsuchrätsel nutzt davon nur Begriffe, die als Wort ins Gitter passen: „to“ wird bei Verben weggelassen, übrig bleiben nur A–Z mit 2–13 Buchstaben. Pro Runde wählt es zehn Wörter mit unterschiedlichen deutschen Übersetzungen.
+- Das Wortsuchrätsel nutzt davon nur Begriffe, die als Wort ins Gitter passen: „to“ wird bei Verben weggelassen, übrig bleiben nur A–Z mit 2–13 Buchstaben. Pro Runde wählt es zehn Wörter mit unterschiedlichen deutschen Übersetzungen. Das Kreuzworträtsel verwendet dieselbe Normalisierung und platziert daraus 8, 12 oder 15 Hinweise in einem Gitter mit höchstens 18 × 18 Feldern.
 - Neue Vokabeln lassen sich mit `node scripts/import-vocabulary.mjs <ordner>` aus Dateien `a1.json` … `c2.json` (Felder `Question` = deutsch, `Answer` = englisch, `PartOfSpeech`, `Topic`, `Synonyms`, `ExampleSentence`, `ExampleSentenceTranslation`) übernehmen. Neue englische Begriffe werden ihrem Niveau angehängt; ist ein Begriff schon vorhanden („to improve“ und „improve“ gelten als gleich), bleibt er in seinem Niveau und fehlende Angaben werden ergänzt. Das Skript kann beliebig oft laufen und prüft den Bestand am Ende mit `validateVocabulary`.
 - Die Tests in `test/vocabulary.test.js` prüfen, dass jeder Eintrag vollständig ist, englische Begriffe eindeutig sind, Symbolbilder existieren und keinen ausführbaren Inhalt haben und jedes Niveau mindestens zehn Gitterwörter mit unterschiedlichen Übersetzungen bietet.
 
@@ -96,7 +97,8 @@ Die Vokabeln liegen je GER-Niveau in `public/data/vocabulary/a1.json` … `c2.js
 │   ├── memory/index.html       # Vokabel-Memory (Einstiegsseite)
 │   ├── vocab-quiz/index.html   # Vokabel-Quiz (Einstiegsseite)
 │   ├── buchstabensalat/index.html # Buchstabensalat (Einstiegsseite)
-│   └── wort-raten/index.html   # Wort raten (Einstiegsseite)
+│   ├── wort-raten/index.html   # Wort raten (Einstiegsseite)
+│   └── crossword/index.html    # Kreuzworträtsel (Einstiegsseite)
 ├── src/
 │   ├── styles.css              # Gemeinsame Styles
 │   ├── shared/                 # Vokabeln laden und prüfen, Zufall, HTML-Escaping (für alle Spiele)
@@ -112,9 +114,12 @@ Die Vokabeln liegen je GER-Niveau in `public/data/vocabulary/a1.json` … `c2.js
 │   ├── buchstabensalat/
 │   │   ├── game.js             # Wortauswahl, Kachelmischung und Züge (ohne DOM)
 │   │   └── main.js             # Oberfläche des Buchstabensalats
-│   └── wort-raten/
-│       ├── game.js             # Wortauswahl, Rateversuche und Spielende (ohne DOM)
-│       └── main.js             # Oberfläche von Wort raten
+│   ├── wort-raten/
+│   │   ├── game.js             # Wortauswahl, Rateversuche und Spielende (ohne DOM)
+│   │   └── main.js             # Oberfläche von Wort raten
+│   └── crossword/
+│       ├── game.js             # Kreuzwort-Generator und Antwortprüfung (ohne DOM)
+│       └── main.js             # Oberfläche des Kreuzworträtsels
 ├── public/data/vocabulary/    # Vokabeldaten je Niveau (a1.json … c2.json)
 ├── public/images/vocabulary/  # Symbolbilder der Vokabeln (SVG) mit LIZENZEN.md
 ├── test/                       # Unit-Tests (Node-Testrunner)
@@ -131,7 +136,7 @@ Technologien: Vanilla JavaScript (ES-Module), HTML und CSS, Build mit Vite 7, Te
 
 | Befehl | Inhalt |
 |--------|--------|
-| `npm test` | Unit-Tests in `test/` (Node-Testrunner): Vokabeldaten, Generator, Klassifikation, Ziehen, Tipp, Memory-Logik |
+| `npm test` | Unit-Tests in `test/` (Node-Testrunner): Vokabeldaten, Generatoren, Klassifikation, Ziehen, Tipp, Memory- und Kreuzwort-Logik |
 | `npm run test:e2e` | Playwright-Tests in `e2e/` gegen den Produktionsbuild unter dem Projekt-Unterpfad |
 | `npm run test:smoke` | Smoke-Test in `smoke/` gegen die veröffentlichte Seite; benötigt `PAGE_URL` |
 
