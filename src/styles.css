@@ -614,6 +614,132 @@ fieldset label {
   cursor: default;
 }
 
+.guess-flower {
+  margin: 0.5rem 0 0.75rem;
+}
+
+.guess-flower svg {
+  display: block;
+  width: min(170px, 45vw);
+  height: auto;
+}
+
+.guess-flower .petal {
+  fill: #d970a7;
+  stroke: #b34a84;
+  stroke-width: 1.5;
+}
+
+.guess-flower .petal.lost {
+  fill: #cbb3c3;
+  stroke: #a98ea1;
+  opacity: 0.8;
+}
+
+.guess-flower .center {
+  fill: #f4c94f;
+  stroke: #d9a32e;
+  stroke-width: 1.5;
+}
+
+.guess-flower .stem {
+  stroke: #3a9a57;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.guess-flower .leaf {
+  fill: #55b06e;
+}
+
+.guess-flower .ground {
+  stroke: #8a7a5c;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.guess-word {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.6rem 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.guess-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(1.8rem, 7vw, 2.5rem);
+  height: clamp(2.2rem, 8vw, 2.9rem);
+  border-bottom: 3px solid #202b48;
+  font: 700 clamp(1rem, 4vw, 1.4rem) / 1 Inter, ui-sans-serif, system-ui, sans-serif;
+  color: #172033;
+}
+
+.guess-slot.gap,
+.guess-slot.hyphen {
+  border-bottom: 0;
+}
+
+.guess-slot.gap {
+  width: 0.6rem;
+}
+
+.guess-hint {
+  font-size: clamp(1.2rem, 4vw, 1.6rem);
+  margin: 0.8rem 0;
+}
+
+.guess-keyboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  max-width: 620px;
+  margin: 0 0 1rem;
+}
+
+.guess-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(1.9rem, 7.5vw, 2.4rem);
+  height: clamp(2.2rem, 8vw, 2.8rem);
+  border: 2px solid #b7bfd5;
+  border-radius: 0.45rem;
+  background: #fff;
+  color: #172033;
+  font: 700 clamp(0.85rem, 3.5vw, 1.05rem) / 1 Inter, ui-sans-serif, system-ui, sans-serif;
+  padding: 0;
+  cursor: pointer;
+}
+
+.guess-key:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: #f1edff;
+}
+
+.guess-key.hit {
+  border-color: #3a9a57;
+  background: #e5f7ea;
+}
+
+.guess-key.miss {
+  border-color: #c94040;
+  background: #fff0f0;
+  color: #a42323;
+}
+
+.guess-key:disabled {
+  cursor: default;
+}
+
+.guess-answer {
+  font-size: clamp(1.2rem, 4vw, 1.6rem);
+  margin: 0.8rem 0;
+}
+
 @media (max-width: 760px) {
   .memory-board {
     --columns: 4 !important;
