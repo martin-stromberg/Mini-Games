@@ -434,6 +434,110 @@ fieldset label {
   overflow-wrap: anywhere;
 }
 
+.quiz-prompt {
+  font-size: clamp(1.2rem, 4vw, 1.7rem);
+  margin: 1.2rem 0 0.8rem;
+}
+
+.quiz-figure {
+  margin: 0.5rem 0 1rem;
+}
+
+.quiz-figure img {
+  width: min(240px, 60vw);
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: #fff;
+  border: 2px solid #b7bfd5;
+  border-radius: 0.7rem;
+  padding: 0.8rem;
+}
+
+.quiz-options {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 560px;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.quiz-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border: 2px solid #b7bfd5;
+  border-radius: 0.55rem;
+  background: #fff;
+  color: #172033;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.quiz-option:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: #f1edff;
+}
+
+.quiz-option:disabled {
+  cursor: default;
+}
+
+.option-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.6em;
+  height: 1.6em;
+  border-radius: 0.35em;
+  background: #202b48;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.quiz-option.correct {
+  border-color: #3a9a57;
+  background: #e5f7ea;
+}
+
+.quiz-option.wrong {
+  border-color: #c94040;
+  background: #fff0f0;
+}
+
+.example {
+  max-width: 560px;
+  margin: 0 0 1rem;
+  padding: 0.6rem 0.9rem;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 0.45rem 0.45rem 0;
+  background: #fff;
+}
+
+.example span {
+  display: block;
+}
+
+.mistakes {
+  margin: 0 0 1.2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.mistakes li {
+  border-top: 1px solid #e3e6ef;
+  padding: 0.55rem 0;
+}
+
+.mistakes small {
+  display: block;
+  color: #667085;
+}
+
 .card.matched {
   border-color: #3a9a57;
   background: #e5f7ea;

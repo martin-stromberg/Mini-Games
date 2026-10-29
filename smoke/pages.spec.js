@@ -32,3 +32,11 @@ test('published memory game starts a round and shows a symbol image', async ({ p
   await expect(imageCard.locator('img')).toBeVisible();
   await expect.poll(() => imageCard.locator('img').evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true);
 });
+
+test('published vocabulary quiz starts a round with four options', async ({ page }) => {
+  await page.goto('./');
+  await page.getByRole('link', { name: 'Vokabel-Quiz' }).click();
+  await expect(page.getByRole('heading', { name: 'Vokabel-Quiz' })).toBeVisible();
+  await page.getByRole('button', { name: 'Runde starten' }).click();
+  await expect(page.locator('[data-option]')).toHaveCount(4);
+});
