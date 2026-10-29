@@ -66,6 +66,7 @@ jobs:
           curl --fail --silent --show-error --retry 5 --retry-delay 5 --retry-all-errors "$PAGE_URL" > /dev/null
           curl --fail --silent --show-error --retry 5 --retry-delay 5 --retry-all-errors "${PAGE_URL%/}/games/word-search/" > /dev/null
           curl --fail --silent --show-error --retry 5 --retry-delay 5 --retry-all-errors "${PAGE_URL%/}/games/memory/" > /dev/null
+          curl --fail --silent --show-error --retry 5 --retry-delay 5 --retry-all-errors "${PAGE_URL%/}/games/buchstabensalat/" > /dev/null
           curl --fail --silent --show-error --retry 5 --retry-delay 5 --retry-all-errors "${PAGE_URL%/}/data/vocabulary/a1.json" > /dev/null
       - name: Browser smoke test of the published page
         run: npm run test:smoke

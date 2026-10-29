@@ -1,3 +1,10 @@
+## 2026-10-29 — Buchstabensalat
+
+- Neues Spiel „Buchstabensalat" unter `games/buchstabensalat/`: Die gemischten Buchstaben einer englischen Vokabel werden als Kacheln in die richtige Reihenfolge gelegt; Hinweis ist die deutsche Übersetzung, bei vorhandenem Symbolbild auch das Bild.
+- Eingabe per Klick, Touch oder Tastatur; gesetzte Buchstaben lassen sich entfernen; automatische Prüfung bei vollständigem Wort; Hilfe „Buchstaben aufdecken" fixiert den nächsten richtigen Buchstaben.
+- Runde mit wählbarer Wortanzahl (5/10/15) und Wortlängen-Filter (kurz/mittel/lang); Auswertung mit gelösten, unterstützten und übersprungenen Wörtern. Verben ohne „to"; Wortgruppen mit Leerzeichen sind ausgeschlossen.
+- Einstiegslink auf der Startseite, Hilfeseite `docs/help/buchstabensalat/`, Unit-Tests `test/buchstabensalat.test.js` und E2E-Tests `e2e/buchstabensalat.spec.js`; Smoke-Test und Workflow-Check ergänzt.
+
 ## 2026-10-27 — Wortsuchrätsel
 
 - Neues Spiel „Wortsuchrätsel“ unter `games/word-search/`: 13 × 13 Gitter, zehn zufällig gewählte englische Wörter pro Runde mit deutschen Übersetzungen, Schwierigkeitsstufen Einfach und Schwierig.

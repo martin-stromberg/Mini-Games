@@ -17,6 +17,7 @@ Die Seite ist so angelegt, dass weitere Spiele unter `games/<spielname>/` ergän
 - Zufällige Füllbuchstaben in allen nicht belegten Feldern
 - **Vokabel-Memory:** je Vokabel eine Bild- und eine Wortkarte; 6 bis 12 Paare, Wortkarten auf Englisch oder Deutsch, Niveauauswahl für alle Niveaus mit Bildern. Einstellungen bleiben im Browser gespeichert. Details: [docs/help/memory](docs/help/memory/index.md)
 - **Vokabel-Quiz (Multiple Choice):** 10, 20 oder 30 Fragen pro Runde; Fragetypen englisch → deutsch, deutsch → englisch und Symbolbild → englisch, gemischt oder einzeln wählbar. Sofortige Rückmeldung mit Beispielsatz, Ergebnis mit Fehlerliste am Ende. Antworten per Klick, Touch oder Tasten 1–4. Details: [docs/help/vocab-quiz](docs/help/vocab-quiz/index.md)
+- **Buchstabensalat:** Die gemischten Buchstaben einer englischen Vokabel als Kacheln in die richtige Reihenfolge legen; Hinweis ist die deutsche Übersetzung (optional mit Symbolbild). 5, 10 oder 15 Wörter pro Runde, Wortlängen-Filter (kurz/mittel/lang), Hilfe „Buchstaben aufdecken", Auswertung am Rundenende. Eingabe per Klick, Touch oder Tastatur. Details: [docs/help/buchstabensalat](docs/help/buchstabensalat/index.md)
 
 ## Installation
 
@@ -42,7 +43,7 @@ Entwicklungsserver starten (Vite, Standardport 5173):
 npm run dev
 ```
 
-Anschließend im Browser `http://localhost:5173/games/word-search/`, `http://localhost:5173/games/memory/` bzw. `http://localhost:5173/games/vocab-quiz/` öffnen. Die Übersicht liegt unter `http://localhost:5173/`.
+Anschließend im Browser `http://localhost:5173/games/word-search/`, `http://localhost:5173/games/memory/`, `http://localhost:5173/games/vocab-quiz/` bzw. `http://localhost:5173/games/buchstabensalat/` öffnen. Die Übersicht liegt unter `http://localhost:5173/`.
 
 Produktionsbuild erzeugen und lokal ausliefern:
 
@@ -92,7 +93,8 @@ Die Vokabeln liegen je GER-Niveau in `public/data/vocabulary/a1.json` … `c2.js
 ├── games/
 │   ├── word-search/index.html  # Wortsuchrätsel (Einstiegsseite)
 │   ├── memory/index.html       # Vokabel-Memory (Einstiegsseite)
-│   └── vocab-quiz/index.html   # Vokabel-Quiz (Einstiegsseite)
+│   ├── vocab-quiz/index.html   # Vokabel-Quiz (Einstiegsseite)
+│   └── buchstabensalat/index.html # Buchstabensalat (Einstiegsseite)
 ├── src/
 │   ├── styles.css              # Gemeinsame Styles
 │   ├── shared/                 # Vokabeln laden und prüfen, Zufall, HTML-Escaping (für alle Spiele)
@@ -102,9 +104,12 @@ Die Vokabeln liegen je GER-Niveau in `public/data/vocabulary/a1.json` … `c2.js
 │   ├── memory/
 │   │   ├── game.js             # Rundenauswahl und Aufdecken (ohne DOM)
 │   │   └── main.js             # Oberfläche des Memorys
-│   └── vocab-quiz/
-│       ├── game.js             # Fragetypen, Distraktoren und Auswertung (ohne DOM)
-│       └── main.js             # Oberfläche des Vokabel-Quiz
+│   ├── vocab-quiz/
+│   │   ├── game.js             # Fragetypen, Distraktoren und Auswertung (ohne DOM)
+│   │   └── main.js             # Oberfläche des Vokabel-Quiz
+│   └── buchstabensalat/
+│       ├── game.js             # Wortauswahl, Kachelmischung und Züge (ohne DOM)
+│       └── main.js             # Oberfläche des Buchstabensalats
 ├── public/data/vocabulary/    # Vokabeldaten je Niveau (a1.json … c2.json)
 ├── public/images/vocabulary/  # Symbolbilder der Vokabeln (SVG) mit LIZENZEN.md
 ├── test/                       # Unit-Tests (Node-Testrunner)
