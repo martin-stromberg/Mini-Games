@@ -1,5 +1,33 @@
 # Release Notes
 
+Nächster Release (unveröffentlicht)
+
+## Important Notes Before Update
+
+- There are no special notices.
+
+## What's New
+
+- New game "Buchstabensalat" (letter scramble): arrange the shuffled letters of an English word in the correct order; the German translation (and optionally a symbol image) is the hint.
+- Rounds of 5, 10 or 15 words with an optional word-length filter (short/medium/long) and CEFR level selection, saved in `localStorage`.
+- Letters are placed by click, touch or keyboard and can be removed again; the word is checked automatically once complete.
+- "Buchstaben aufdecken" reveals the next correct letter and counts as a used hint; words can be skipped.
+- End-of-round summary listing solved words, used hints and skipped words with their solutions.
+
+## Wichtige Hinweise vor dem Update
+
+- Es gibt keine besonderen Hinweise.
+
+## Neuerungen
+
+- Neues Spiel „Buchstabensalat": Die gemischten Buchstaben einer englischen Vokabel in die richtige Reihenfolge legen; Hinweis ist die deutsche Übersetzung (optional mit Symbolbild).
+- Runden mit 5, 10 oder 15 Wörtern, optionalem Wortlängen-Filter (kurz/mittel/lang) und GER-Niveauauswahl, gespeichert in `localStorage`.
+- Buchstaben werden per Klick, Touch oder Tastatur gesetzt und können wieder entfernt werden; das vollständige Wort wird automatisch geprüft.
+- „Buchstaben aufdecken" setzt den nächsten richtigen Buchstaben fest und zählt als genutzte Hilfe; Wörter können übersprungen werden.
+- Auswertung am Rundenende mit gelösten Wörtern, genutzten Hilfen und übersprungenen Wörtern samt Lösungen.
+
+---
+
 Version 1.0.0 (2026-10-27)
 
 ## Important Notes Before Update

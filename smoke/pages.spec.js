@@ -40,3 +40,12 @@ test('published vocabulary quiz starts a round with four options', async ({ page
   await page.getByRole('button', { name: 'Runde starten' }).click();
   await expect(page.locator('[data-option]')).toHaveCount(4);
 });
+
+test('published letter scramble starts a round with tiles and slots', async ({ page }) => {
+  await page.goto('./');
+  await page.getByRole('link', { name: 'Buchstabensalat' }).click();
+  await expect(page.getByRole('heading', { name: 'Buchstabensalat' })).toBeVisible();
+  await page.getByRole('button', { name: 'Runde starten' }).click();
+  await expect(page.locator('.scramble-tile').first()).toBeVisible();
+  await expect(page.locator('.scramble-slot').first()).toBeVisible();
+});

@@ -11,7 +11,8 @@ export default defineConfig({
         home: resolve(import.meta.dirname, 'index.html'),
         wordSearch: resolve(import.meta.dirname, 'games/word-search/index.html'),
         memory: resolve(import.meta.dirname, 'games/memory/index.html'),
-        vocabQuiz: resolve(import.meta.dirname, 'games/vocab-quiz/index.html')
+        vocabQuiz: resolve(import.meta.dirname, 'games/vocab-quiz/index.html'),
+        buchstabensalat: resolve(import.meta.dirname, 'games/buchstabensalat/index.html')
       }
     }
   }
