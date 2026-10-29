@@ -49,3 +49,13 @@ test('published letter scramble starts a round with tiles and slots', async ({ p
   await expect(page.locator('.scramble-tile').first()).toBeVisible();
   await expect(page.locator('.scramble-slot').first()).toBeVisible();
 });
+
+test('published word guessing starts a game with keys and slots', async ({ page }) => {
+  await page.goto('./');
+  await page.getByRole('link', { name: 'Wort raten' }).click();
+  await expect(page.getByRole('heading', { name: 'Wort raten' })).toBeVisible();
+  await page.getByRole('button', { name: 'Spiel starten' }).click();
+  await expect(page.locator('[data-key]')).toHaveCount(26);
+  await expect(page.locator('[data-word] .guess-slot').first()).toBeVisible();
+  await expect(page.locator('[data-flower]')).toBeVisible();
+});

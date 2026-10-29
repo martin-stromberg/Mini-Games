@@ -12,7 +12,8 @@ export default defineConfig({
         wordSearch: resolve(import.meta.dirname, 'games/word-search/index.html'),
         memory: resolve(import.meta.dirname, 'games/memory/index.html'),
         vocabQuiz: resolve(import.meta.dirname, 'games/vocab-quiz/index.html'),
-        buchstabensalat: resolve(import.meta.dirname, 'games/buchstabensalat/index.html')
+        buchstabensalat: resolve(import.meta.dirname, 'games/buchstabensalat/index.html'),
+        wortRaten: resolve(import.meta.dirname, 'games/wort-raten/index.html')
       }
     }
   }

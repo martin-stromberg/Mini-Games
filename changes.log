@@ -1,3 +1,10 @@
+## 2026-10-29 — Wort raten
+
+- Neues Spiel „Wort raten" unter `games/wort-raten/`: Ein englisches Wort wird Buchstabe für Buchstabe erraten (Galgenmännchen-Prinzip); statt eines Galgens verliert eine Blume bei jedem Fehlversuch ein Blütenblatt.
+- Eingabe über Bildschirmtastatur A–Z oder physische Tastatur; versuchte Buchstaben werden deaktiviert und als im Wort/nicht im Wort markiert; gleiche Buchstaben werden an allen Positionen aufgedeckt; Leerzeichen und Bindestriche stehen offen.
+- Zuschaltbarer Hinweis mit deutscher Übersetzung (und Symbolbild, falls vorhanden); Schwierigkeit über 6/8/10 erlaubte Fehlversuche, Wortlängen-Filter (kurz/mittel/lang) und GER-Niveaus; Zähler für gewonnene/verlorene Wörter der Sitzung; Gewinn zeigt Wort, Übersetzung und Beispielsatz.
+- Einstiegslink auf der Startseite, Hilfeseite `docs/help/wort-raten/`, Unit-Tests `test/wort-raten.test.js` und E2E-Tests `e2e/wort-raten.spec.js`; Smoke-Test und Workflow-Check ergänzt.
+
 ## 2026-10-29 — Buchstabensalat
 
 - Neues Spiel „Buchstabensalat" unter `games/buchstabensalat/`: Die gemischten Buchstaben einer englischen Vokabel werden als Kacheln in die richtige Reihenfolge gelegt; Hinweis ist die deutsche Übersetzung, bei vorhandenem Symbolbild auch das Bild.
