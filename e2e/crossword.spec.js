@@ -87,6 +87,18 @@ test.describe('Kreuzworträtsel: Spielablauf', () => {
     await expect(result(page)).toHaveText(`1 von ${round.words.length} Wörtern vollständig · Hilfen: 1`);
   });
 
+  test('the hint button fills open letters and shows the example only once', async ({ page }) => {
+    const round = await openGame(page, { seed: 21 });
+    const word = round.wordById[round.across[0]];
+    await clue(page, word).click();
+    const hintButton = page.getByRole('button', { name: 'Tipp' });
+    await hintButton.click();
+    await expect(result(page)).toContainText('Hilfen: 1');
+    for (let index = 0; index < word.answer.length + 1; index++) await hintButton.click();
+    for (const [index, key] of word.cells.entries()) await expect(cell(page, key)).toHaveValue(word.answer[index]);
+    await expect(page.locator('[data-example]')).toHaveCount(word.exampleGerman ? 1 : 0);
+  });
+
   test('clicking a crossing twice switches from across to down', async ({ page }) => {
     const round = await openGame(page, { seed: 11 });
     const crossingCell = Object.values(round.cells).find(cell => cell.words.length > 1);

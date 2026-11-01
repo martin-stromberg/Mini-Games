@@ -1,0 +1,42 @@
+name: Staging → main PR
+
+on:
+  push:
+    branches:
+      - staging
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: staging-main-pr
+  cancel-in-progress: false
+
+jobs:
+  staging-pr:
+    runs-on: ubuntu-latest
+    env:
+      # Hinweis: Mit GITHUB_TOKEN erstellte PRs lösen keine pull_request-Workflows aus.
+      # Soll der Verify-Check auf dem PR laufen, ein PAT als Secret STAGING_PR_TOKEN hinterlegen.
+      GH_TOKEN: ${{ secrets.STAGING_PR_TOKEN || secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Create or update the staging → main pull request
+        run: |
+          set -euo pipefail
+          ahead=$(gh api "repos/$REPO/compare/main...staging" --jq .ahead_by)
+          if [ -z "$ahead" ] || [ "$ahead" -eq 0 ]; then
+            echo "staging enthält keine neuen Commits gegenüber main – kein PR nötig."
+            exit 0
+          fi
+          existing=$(gh pr list --repo "$REPO" --base main --head staging --state open --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh pr comment "$existing" --repo "$REPO" --body "Neue Commits auf \`staging\` sind eingegangen; dieser PR enthält jetzt den aktuellen Stand."
+            echo "Offener PR #$existing wurde kommentiert."
+            exit 0
+          fi
+          commits=$(gh api "repos/$REPO/compare/main...staging" --jq '.commits[] | "- " + (.commit.message | split("\n")[0])')
+          body="Automatisch erstellter PR: Überführt \`staging\` nach \`main\`. Der GitHub-Pages-Deploy startet nach dem Merge automatisch."$'\n\n'"$commits"
+          gh pr create --repo "$REPO" --base main --head staging --title "Promotion from Staging to Main" --body "$body"
+          echo "Staging-PR erstellt."

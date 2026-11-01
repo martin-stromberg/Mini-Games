@@ -1,3 +1,8 @@
+## 2026-11-01 — Tipp im Kreuzworträtsel
+
+- Neuer „Tipp“-Button im Kreuzworträtsel: Pro Anforderung wird per Zufall entweder der deutsche Beispielsatz zum Hinweiswort eingeblendet (pro Wort nur einmal) oder ein zufälliger noch offener Buchstabe des gewählten Wortes eingetragen; beide Varianten zählen als Hilfe.
+- Auswahllogik in `hintFor` (`src/crossword/game.js`); Unit-Tests in `test/crossword.test.js`, E2E-Test in `e2e/crossword.spec.js`; Hilfeseite und README aktualisiert.
+
 ## 2026-10-29 — Kreuzworträtsel
 
 - Neues Spiel „Kreuzworträtsel" unter `games/crossword/`: Deutsche Übersetzungen bilden die Hinweise, englische Einzelwörter werden automatisch zu einem kompakten, zusammenhängenden Gitter verkreuzt.

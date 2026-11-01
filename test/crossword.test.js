@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { DEFAULT_WORD_COUNT, DIRECTION, MAX_GRID_SPAN, WORD_COUNT_OPTIONS, allCellKeys, checkAnswers, completedWords, countByLevel, createRound, crosswordWords, distinctGermanCount, firstEmptyIndex, initialAnswers, revealWord, validatePuzzle, wordsAtCell } from '../src/crossword/game.js';
+import { DEFAULT_WORD_COUNT, DIRECTION, MAX_GRID_SPAN, WORD_COUNT_OPTIONS, allCellKeys, checkAnswers, completedWords, countByLevel, createRound, crosswordWords, distinctGermanCount, firstEmptyIndex, hintFor, initialAnswers, revealWord, validatePuzzle, wordsAtCell } from '../src/crossword/game.js';
 import { seededRandom } from '../src/shared/random.js';
 import { LEVELS } from '../src/shared/vocabulary.js';
 import { vocabulary } from './fixtures/rounds.js';
@@ -95,4 +95,50 @@ test('answers can be checked, words completed and a word revealed', () => {
   const revealed = revealWord(round, answers, round.words[1].id);
   for (const key of round.words[1].cells) assert.equal(revealed[key], round.cells[key].letter);
   assert.equal(checkAnswers(round, revealed).wrong.length, 0);
+});
+
+test('the hint shows the example once and otherwise reveals open letters', () => {
+  const round = roundFor(9, { count: 8 });
+  const word = round.words.find(item => item.exampleGerman);
+  const answers = initialAnswers(round);
+
+  const first = hintFor(round, answers, word.id, { examples: new Set(), rng: () => 0 });
+  assert.equal(first.type, 'example');
+  assert.equal(first.example, word.exampleGerman);
+
+  const second = hintFor(round, answers, word.id, { examples: new Set([word.id]), rng: () => 0 });
+  assert.equal(second.type, 'letter');
+  assert.ok(word.cells.includes(second.key));
+  assert.equal(second.letter, round.cells[second.key].letter);
+});
+
+test('the letter hint only targets cells that are not yet correct', () => {
+  const round = roundFor(9, { count: 8 });
+  const word = round.words[0];
+  const answers = initialAnswers(round);
+  answers[word.cells[0]] = round.cells[word.cells[0]].letter;
+  const hint = hintFor(round, answers, word.id, { examples: new Set([word.id]), rng: () => 0 });
+  assert.equal(hint.type, 'letter');
+  assert.notEqual(hint.key, word.cells[0]);
+});
+
+test('a fully answered word still offers the example once, then nothing', () => {
+  const round = roundFor(9, { count: 8 });
+  const word = round.words.find(item => item.exampleGerman);
+  const answers = initialAnswers(round);
+  for (const key of word.cells) answers[key] = round.cells[key].letter;
+  assert.equal(hintFor(round, answers, word.id, { examples: new Set(), rng: () => 0.9 }).type, 'example');
+  assert.equal(hintFor(round, answers, word.id, { examples: new Set([word.id]), rng: () => 0 }).type, 'none');
+});
+
+test('a word without an example text only gives letter hints', () => {
+  const round = {
+    wordById: { 'word-1': { id: 'word-1', answer: 'CAT', cells: ['0,0', '0,1', '0,2'] } },
+    cells: { '0,0': { letter: 'C' }, '0,1': { letter: 'A' }, '0,2': { letter: 'T' } }
+  };
+  const answers = { '0,0': '', '0,1': '', '0,2': '' };
+  const hint = hintFor(round, answers, 'word-1', { rng: () => 0 });
+  assert.equal(hint.type, 'letter');
+  assert.equal(hint.key, '0,0');
+  assert.equal(hint.letter, 'C');
 });
