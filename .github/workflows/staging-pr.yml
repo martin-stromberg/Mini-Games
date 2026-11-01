@@ -38,5 +38,5 @@ jobs:
           fi
           commits=$(gh api "repos/$REPO/compare/main...staging" --jq '.commits[] | "- " + (.commit.message | split("\n")[0])')
           body="Automatisch erstellter PR: Überführt \`staging\` nach \`main\`. Der GitHub-Pages-Deploy startet nach dem Merge automatisch."$'\n\n'"$commits"
-          gh pr create --repo "$REPO" --base main --head staging --title "Staging" --body "$body"
+          gh pr create --repo "$REPO" --base main --head staging --title "Promotion from Staging to Main" --body "$body"
           echo "Staging-PR erstellt."
