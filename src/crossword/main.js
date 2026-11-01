@@ -1,4 +1,4 @@
-import { DEFAULT_WORD_COUNT, DIRECTION, STORAGE_KEY, WORD_COUNT_OPTIONS, checkAnswers, completedWords, coordKey, countByLevel, createRound, crosswordWords, distinctGermanCount, firstEmptyIndex, initialAnswers, parseKey, revealWord, wordsAtCell } from './game.js';
+import { DEFAULT_WORD_COUNT, DIRECTION, STORAGE_KEY, WORD_COUNT_OPTIONS, checkAnswers, completedWords, coordKey, countByLevel, createRound, crosswordWords, distinctGermanCount, firstEmptyIndex, hintFor, initialAnswers, parseKey, revealWord, wordsAtCell } from './game.js';
 import { escapeHtml } from '../shared/html.js';
 import { createRandomSource } from '../shared/random.js';
 import { LEVELS, loadVocabulary, validateVocabulary } from '../shared/vocabulary.js';
@@ -25,6 +25,7 @@ const state = {
   active: null,
   wrong: new Set(),
   revealed: new Set(),
+  examples: new Set(),
   helps: 0,
   solved: false,
   message: '',
@@ -109,6 +110,7 @@ function startRound() {
     state.active = { wordId: first.id, index: firstEmptyIndex(state.round, state.answers, first) };
     state.wrong = new Set();
     state.revealed = new Set();
+    state.examples = new Set();
     state.helps = 0;
     state.solved = false;
     state.message = 'Neue Runde gestartet. Wähle ein Feld oder einen Hinweis und tippe das englische Wort.';
@@ -222,7 +224,8 @@ function renderClues(direction) {
 function renderActiveClue() {
   const word = activeWord();
   if (!word) return '';
-  return `<p class="active-clue" data-active-clue><strong>${word.number} ${DIRECTION_LABELS[word.direction]}:</strong> ${escapeHtml(word.clue)}</p>`;
+  const example = state.examples.has(word.id) && word.exampleGerman ? `<p class="example" data-example><span lang="de">${escapeHtml(word.exampleGerman)}</span></p>` : '';
+  return `<p class="active-clue" data-active-clue><strong>${word.number} ${DIRECTION_LABELS[word.direction]}:</strong> ${escapeHtml(word.clue)}</p>${example}`;
 }
 
 function renderResult() {
@@ -248,6 +251,7 @@ function renderGame(focusKey = activeKey()) {
     <div class="game-layout crossword-layout">
       <section aria-label="Spielfeld">${renderBoard()}<div class="actions">
         <button type="button" data-action="check" ${state.solved ? 'disabled' : ''}>Prüfen</button>
+        <button type="button" data-action="hint" ${state.solved ? 'disabled' : ''}>Tipp</button>
         <button type="button" data-action="reveal" ${state.solved ? 'disabled' : ''}>Wort aufdecken</button>
       </div></section>
       <aside class="clue-columns" aria-label="Hinweise">${renderClues(DIRECTION.ACROSS)}${renderClues(DIRECTION.DOWN)}</aside>
@@ -361,6 +365,26 @@ function checkRound() {
   renderGame(activeKey());
 }
 
+function useHint() {
+  const word = activeWord();
+  if (!word || state.solved) return;
+  const hint = hintFor(state.round, state.answers, word.id, { examples: state.examples, rng: state.rng });
+  if (hint.type === 'example') {
+    state.examples.add(word.id);
+    state.helps += 1;
+    state.message = `Beispielsatz für Wort ${word.number} ${DIRECTION_LABELS[word.direction]} eingeblendet.`;
+  } else if (hint.type === 'letter') {
+    state.answers[hint.key] = hint.letter;
+    state.wrong.delete(hint.key);
+    state.helps += 1;
+    updateSolved();
+    if (!state.solved) state.message = `Tipp für Wort ${word.number} ${DIRECTION_LABELS[word.direction]}: Buchstabe ${hint.letter} eingetragen.`;
+  } else {
+    state.message = `Für Wort ${word.number} ${DIRECTION_LABELS[word.direction]} ist kein Tipp mehr möglich.`;
+  }
+  renderGame(activeKey());
+}
+
 function revealActiveWord() {
   const word = activeWord();
   if (!word || state.solved) return;
@@ -377,6 +401,7 @@ function bindGameEvents() {
   document.querySelector('[data-action=settings]').addEventListener('click', () => { state.message = ''; renderSetup(); });
   document.querySelector('[data-action=new-round]').addEventListener('click', startRound);
   document.querySelector('[data-action=check]').addEventListener('click', checkRound);
+  document.querySelector('[data-action=hint]').addEventListener('click', useHint);
   document.querySelector('[data-action=reveal]').addEventListener('click', revealActiveWord);
   document.querySelectorAll('[data-clue]').forEach(button => button.addEventListener('click', () => selectWord(button.dataset.clue)));
   document.querySelectorAll('.crossword-input').forEach(input => {
