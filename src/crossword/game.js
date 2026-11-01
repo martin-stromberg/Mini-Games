@@ -193,6 +193,7 @@ function normalizeRound(placed) {
       answer: placement.item.answer,
       clue: placement.item.word.german,
       german: placement.item.word.german,
+      exampleGerman: placement.item.word.exampleGerman,
       partOfSpeech: placement.item.word.partOfSpeech,
       level: placement.item.word.level,
       direction: placement.direction,
@@ -354,4 +355,17 @@ export function revealWord(round, answers, wordId) {
   const next = { ...answers };
   for (const key of word.cells) next[key] = round.cells[key].letter;
   return next;
+}
+
+// Tipp für das gewählte Wort: Zufall entscheidet zwischen dem deutschen Beispielsatz der
+// Vokabel (pro Wort nur einmal verfügbar) und einem zufälligen noch offenen Buchstaben.
+export function hintFor(round, answers, wordId, { examples = new Set(), rng = Math.random } = {}) {
+  const word = round.wordById[wordId];
+  if (!word) return { type: 'none' };
+  const open = word.cells.filter(key => String(answers[key] || '').toUpperCase() !== round.cells[key].letter);
+  const example = typeof word.exampleGerman === 'string' && word.exampleGerman.trim() ? word.exampleGerman.trim() : null;
+  if (example && !examples.has(wordId) && (!open.length || rng() < 0.5)) return { type: 'example', example };
+  if (!open.length) return { type: 'none' };
+  const key = open[Math.floor(rng() * open.length)];
+  return { type: 'letter', key, letter: round.cells[key].letter };
 }

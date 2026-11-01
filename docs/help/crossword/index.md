@@ -20,7 +20,8 @@ Die Einstellungen bleiben im Browser gespeichert. Reicht der Wortvorrat der gew�
 3. Buchstaben werden per Tastatur eingetragen. Auf Touch-Geräten öffnet ein Feld die Bildschirmtastatur; das aktive Feld wird beim Fokussieren in den sichtbaren Bereich gerückt.
 4. Die Pfeiltasten bewegen zum benachbarten Feld, Home/Ende springen an Wortanfang oder Wortende. Backspace löscht den aktuellen Buchstaben oder geht ein Feld zurück und löscht dort.
 5. „Prüfen“ markiert falsch gefüllte Felder rot und nennt außerdem die Zahl noch leerer Felder. Bereits gefundene, vollständige Wörter sind in der Hinweisliste grün markiert.
-6. „Wort aufdecken“ trägt das aktive Wort als Hilfe vollständig ein. Das Rätsel ist gelöst, sobald alle Buchstaben richtig stehen.
+6. „Tipp“ hilft beim aktiven Wort: Per Zufall wird entweder der deutsche Beispielsatz der Vokabel eingeblendet (pro Wort nur einmal) oder ein zufälliger noch offener Buchstabe eingetragen. Jeder Tipp zählt als Hilfe.
+7. „Wort aufdecken“ trägt das aktive Wort als Hilfe vollständig ein. Das Rätsel ist gelöst, sobald alle Buchstaben richtig stehen.
 
 ## Technik
 
@@ -29,6 +30,7 @@ Die Einstellungen bleiben im Browser gespeichert. Reicht der Wortvorrat der gew�
 - Die Wortauswahl nutzt die Normalisierung des Wortsuchrätsels: Verben ohne „to“, nur durchgehende Einzelwörter aus A–Z, dedupliziert nach dem englischen Lösungswort. Hinweise werden außerdem nur mit eindeutigen deutschen Übersetzungen gewählt.
 - Der Generator platziert zuerst ein langes Wort und danach jeweils eine der besten legalen Verkreuzungen. Überlagerungen sind nur mit gleichem Buchstaben in der Gegenrichtung erlaubt; Wortenden bleiben frei und nicht kreuzende Felder dürfen nicht seitlich aneinander liegen. Kandidaten mit vielen Kreuzungen und kleiner Bounding Box werden bevorzugt, Gitter sind höchstens 18×18 groß.
 - `validatePuzzle` prüft für Unit-Tests, dass alle Wörter korrekt liegen, jede zusammenhängende Buchstabenfolge genau einem eingetragenen Wort entspricht, keine unerlaubten Berührungen existieren und alle Felder zusammenhängen.
+- `hintFor` wählt für den Tipp zufällig zwischen dem deutschen Beispielsatz (`exampleGerman`) der Vokabel und einem zufälligen noch offenen Buchstaben; der Beispielsatz steht pro Wort nur einmal zur Verfügung.
 - Einstellungen liegen in `localStorage` unter `mini-games.crossword.settings`.
 
 ## Fehlerbehebung
